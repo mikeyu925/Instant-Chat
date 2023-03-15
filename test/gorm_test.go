@@ -1,20 +1,22 @@
-package main
+package test
 
 import (
 	"IM/models"
+	"IM/utils"
 	"fmt"
+	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"testing"
 )
 
-func main() {
-
-	db, err := gorm.Open(mysql.Open("root:ywh666@tcp(47.117.125.6:3306)/ginchat?charset=utf8&parseTime=True&loc=Local"), &gorm.Config{})
+func TestGorm(t *testing.T) {
+	utils.InitConfig()
+	db, err := gorm.Open(mysql.Open(viper.GetString("mysql.dns")), &gorm.Config{})
 	if err != nil {
 		fmt.Println("连接数据库出错")
 		panic(err)
 	}
-
 	// Migrate the schema
 	db.AutoMigrate(&models.UserBasic{})
 
@@ -22,7 +24,7 @@ func main() {
 	user := &models.UserBasic{}
 	user.Name = "root"
 	user.PassWord = "123456"
-	//db.Create(&user)
+	db.Create(&user)
 
 	// Read
 	fmt.Println(db.First(user, 1)) // find product with integer primary key

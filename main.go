@@ -2,9 +2,12 @@ package main
 
 import (
 	"IM/router"
+	"IM/utils"
 )
 
 func main() {
+	utils.InitConfig()
+	utils.InitMySQL()
 	r := router.Router()
-	r.Run() // listen and serve on 0.0.0.0:8080
+	r.Run() // listen and serve
 }

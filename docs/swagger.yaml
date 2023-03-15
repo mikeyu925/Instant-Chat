@@ -1,0 +1,22 @@
+info:
+  contact: {}
+paths:
+  /index:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      tags:
+      - 首页
+  /user/getUserList:
+    get:
+      responses:
+        "200":
+          description: code","message"}
+          schema:
+            type: string
+      tags:
+      - 首页
+swagger: "2.0"
