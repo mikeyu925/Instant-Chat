@@ -1,2 +1,8 @@
 mysql:
   dns: root:ywh666@tcp(47.117.125.6:3306)/ginchat?charset=utf8&parseTime=True&loc=Local
+redis:
+  addr: "47.117.125.6:6379"
+  password: ""
+  DB: 0
+  poolSize: 30
+  miniIdleConn: 30
