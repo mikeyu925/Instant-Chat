@@ -38,8 +38,6 @@ func CreateUser(c *gin.Context) {
 	user.Name = c.Request.FormValue("name")
 	password := c.Request.FormValue("password")
 	repassword := c.Request.FormValue("Identity")
-	//fmt.Println(user.Name, "  >>>>>>>>>>>  ", password, repassword)
-
 	if user.Name == "" || password == "" || repassword == "" {
 		c.JSON(200, gin.H{
 			"code":    -1, //  0成功   -1失败
