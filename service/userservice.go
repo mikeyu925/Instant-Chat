@@ -253,6 +253,10 @@ func MsgHandler(c *gin.Context, ws *websocket.Conn) {
 	}
 }
 
+func SendUserMsg(c *gin.Context) {
+	models.Chat(c.Writer, c.Request)
+}
+
 /*
 func RedisMsg(c *gin.Context) {
 	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
@@ -264,9 +268,7 @@ func RedisMsg(c *gin.Context) {
 	utils.RespOKList(c.Writer, "ok", res)
 }
 
-func SendUserMsg(c *gin.Context) {
-	models.Chat(c.Writer, c.Request)
-}
+
 func SearchFriends(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Request.FormValue("userId"))
 	users := models.SearchFriend(uint(id))
