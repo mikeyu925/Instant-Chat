@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+	"log"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -207,6 +210,131 @@ func FindUserByNameAndPwd(c *gin.Context) {
 	})
 }
 
+// 防止跨域站点伪造请求
+var upGrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+func SendMsg(c *gin.Context) {
+	// 协议升级
+	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// 延迟关闭
+	defer func(ws *websocket.Conn) {
+		err = ws.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(ws)
+	// 消息处理Handler
+	MsgHandler(c, ws)
+}
+
+func MsgHandler(c *gin.Context, ws *websocket.Conn) {
+	for {
+		msg, err := utils.Subscribe(c, utils.PublishKey)
+		if err != nil {
+			fmt.Println(" MsgHandler 发送失败", err)
+		}
+
+		// 获取当前时间
+		tm := time.Now().Format("2006-01-02 15:04:05")
+		m := fmt.Sprintf("[ws][%s]:%s", tm, msg)
+		// 写数据返回
+		err = ws.WriteMessage(1, []byte(m))
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+}
+
+/*
+func RedisMsg(c *gin.Context) {
+	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
+	userIdB, _ := strconv.Atoi(c.PostForm("userIdB"))
+	start, _ := strconv.Atoi(c.PostForm("start"))
+	end, _ := strconv.Atoi(c.PostForm("end"))
+	isRev, _ := strconv.ParseBool(c.PostForm("isRev"))
+	res := models.RedisMsg(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev)
+	utils.RespOKList(c.Writer, "ok", res)
+}
+
+func SendUserMsg(c *gin.Context) {
+	models.Chat(c.Writer, c.Request)
+}
+func SearchFriends(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Request.FormValue("userId"))
+	users := models.SearchFriend(uint(id))
+	// c.JSON(200, gin.H{
+	// 	"code":    0, //  0成功   -1失败
+	// 	"message": "查询好友列表成功！",
+	// 	"data":    users,
+	// })
+	utils.RespOKList(c.Writer, users, len(users))
+}
+
+func AddFriend(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
+	targetName := c.Request.FormValue("targetName")
+	//targetId, _ := strconv.Atoi(c.Request.FormValue("targetId"))
+	code, msg := models.AddFriend(uint(userId), targetName)
+	if code == 0 {
+		utils.RespOK(c.Writer, code, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+}
+
+// 新建群
+func CreateCommunity(c *gin.Context) {
+	ownerId, _ := strconv.Atoi(c.Request.FormValue("ownerId"))
+	name := c.Request.FormValue("name")
+	icon := c.Request.FormValue("icon")
+	desc := c.Request.FormValue("desc")
+	community := models.Community{}
+	community.OwnerId = uint(ownerId)
+	community.Name = name
+	community.Img = icon
+	community.Desc = desc
+	code, msg := models.CreateCommunity(community)
+	if code == 0 {
+		utils.RespOK(c.Writer, code, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+}
+
+// 加载群列表
+func LoadCommunity(c *gin.Context) {
+	ownerId, _ := strconv.Atoi(c.Request.FormValue("ownerId"))
+	//	name := c.Request.FormValue("name")
+	data, msg := models.LoadCommunity(uint(ownerId))
+	if len(data) != 0 {
+		utils.RespList(c.Writer, 0, data, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+}
+
+// 加入群 userId uint, comId uint
+func JoinGroups(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
+	comId := c.Request.FormValue("comId")
+
+	//	name := c.Request.FormValue("name")
+	data, msg := models.JoinGroup(uint(userId), comId)
+	if data == 0 {
+		utils.RespOK(c.Writer, data, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+}
+
 func FindByID(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
 
@@ -214,3 +342,4 @@ func FindByID(c *gin.Context) {
 	data := models.FindByID(uint(userId))
 	utils.RespOK(c.Writer, data, "ok")
 }
+*/
