@@ -54,6 +54,7 @@
                     if(res.code!=0){
                         mui.toast(res.message)
                     }else{
+                        // 传惨方式可以修改，为传递一个变量
                         var url = "/toChat?userId="+res.data.ID+"&token="+res.data.Identity
                         userInfo(res.data)
                         userId(res.data.ID)

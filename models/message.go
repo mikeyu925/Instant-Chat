@@ -63,7 +63,7 @@ type Node struct {
 	GroupSets     set.Interface   //好友 / 群
 }
 
-// 映射关系
+// 映射关系 存储连接
 var clientMap map[int64]*Node = make(map[int64]*Node, 0)
 
 // 读写锁
@@ -217,7 +217,7 @@ func udpRecvProc() {
 	}
 }
 
-// 后端调度逻辑处理
+// 后端调度逻辑处理--> 进行转发
 func dispatch(data []byte) {
 	msg := Message{}
 	msg.CreateTime = uint64(time.Now().Unix())
