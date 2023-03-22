@@ -255,7 +255,6 @@ func SendUserMsg(c *gin.Context) {
 	models.Chat(c.Writer, c.Request)
 }
 
-// 查找好友
 func SearchFriends(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Request.FormValue("userId")) // 获取用户id
 	users := models.SearchFriend(uint(id))               // 得到用户的好友信息

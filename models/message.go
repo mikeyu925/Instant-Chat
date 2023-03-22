@@ -109,11 +109,11 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	rwLocker.Unlock()
 	//5.完成发送逻辑
 	go sendProc(node)
-	//6.完成接受逻辑
+	//6.完成接收逻辑
 	go recvProc(node)
+
 	//7.加入在线用户到缓存
 	//SetUserOnlineInfo("online_"+Idstr, []byte(node.Addr), time.Duration(viper.GetInt("timeout.RedisOnlineTime"))*time.Hour)
-
 	sendMsg(userId, []byte("欢迎进入聊天系统"))
 }
 

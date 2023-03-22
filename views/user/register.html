@@ -3,7 +3,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>IM解决方案</title>
+    <title>FishChat</title>
     <link rel="stylesheet" href="/asset/plugins/mui/css/mui.css" />
     <link rel="stylesheet" href="/asset/css/login.css" />
     <link rel="icon" href="asset/images/favicon.ico" type="image/x-icon" />
@@ -64,9 +64,8 @@
                     if (res.code != 0) {
                         mui.toast(res.message)
                     } else {
-                        //location.replace("localhost:8081")
                         location.href = "/"
-                        mui.toast("注册成功,即将跳转")
+                        mui.toast("注册成功,即将跳转至登陆页面")
                     }
                 })
             },

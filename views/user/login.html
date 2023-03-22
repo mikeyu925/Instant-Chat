@@ -60,11 +60,9 @@
                     } else {
                         var url = "/chat/index.shtml?id=" + res.data.id
                             + "&token=" + res.data.token
-                        userInfo(res.data)
+                        userInfo(res.data)  // 设置userinfo
                         userId(res.data.id)
-                        // localStorage.setItem('userInfo', JSON.stringify(res.data))
                         location.href = url
-                        //mui.alert(url)
                     }
                 })
             },

@@ -263,7 +263,7 @@
                     }
                 },
                 showweixin: function () {
-                    mui.alert("请加微信号msb-shenzhuan索取")
+                    mui.alert("请加微信号：__smallfish_")
                 },
                 showmsg: function (user, msg, isReverse, isFirst) {
                     //console.log(">>>>>>>>>>>", user)
@@ -316,10 +316,10 @@
                         var msg = this.createmsgcontext();
                         msg.Media = 1;
                         msg.Content = txt;
-                        if (msg.Type == 1) {
+                        if (msg.Type == 1) {  // 在自己的页面显示消息
                             this.showmsg(userInfo(), msg);
                         }
-
+                        // 通过webSocket发送
                         this.webSocket.send(JSON.stringify(msg))
                     }
                 },
