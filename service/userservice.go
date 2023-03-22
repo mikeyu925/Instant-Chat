@@ -278,7 +278,6 @@ func RedisMsg(c *gin.Context) {
 }
 
 
-
 func AddFriend(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
 	targetName := c.Request.FormValue("targetName")

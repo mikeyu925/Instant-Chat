@@ -15,10 +15,12 @@
                      ((item.msg.Type==1) && (item.ismine? item.msg.TargetId==msgcontext.TargetId : item.msg.userId==msgcontext.TargetId ))  私聊判断
                || ((item.msg.Type==2) && ( item.msg.TargetId==msgcontext.TargetId ))  群聊判断
                     -->
-                    <li class="chat " :class="item.ismine?'mine':'other'" v-for="item in msglist" v-if=" item.msg.Type==msgcontext.Type  
+
+                    <li class="chat " :class="item.ismine?'mine':'other'" v-for="item in msglist" v-if=" item.msg.Type==msgcontext.Type
                     && ((item.msg.Type==1) && (item.ismine? item.msg.TargetId==msgcontext.TargetId : item.msg.userId==msgcontext.TargetId ))
                     || ((item.msg.Type==2) && ( item.msg.TargetId==msgcontext.TargetId ))
                     ">
+
                         <!--  
                     <div v-text="item.msg"></div>
                     <div v-text="msgcontext"></div>

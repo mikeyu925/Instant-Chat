@@ -1,6 +1,5 @@
 {{define "/chat/foot.shtml"}}
 <script>
-
     function upload(dom) {
         uploadfile("attach/upload", dom, function (res) {
             if (res.Code == 0) {
@@ -308,8 +307,7 @@
                 startrecord: function () {
 
                 },
-                //跟谁单聊
-                sendtxtmsg: function (txt) {
+                sendtxtmsg: function (txt) {//跟谁单聊
                     if (this.isDisable) {
                         this.setTimeFlag()
                         //{id:1,userid:2,dstid:3,cmd:10,media:1,content:"hello"}
@@ -323,6 +321,7 @@
                         this.webSocket.send(JSON.stringify(msg))
                     }
                 },
+                // 发送图片
                 sendpicmsg: function (picurl) {
                     if (this.isDisable) {
                         this.setTimeFlag()
@@ -336,6 +335,7 @@
                         this.webSocket.send(JSON.stringify(msg))
                     }
                 },
+                // 发送语言
                 sendaudiomsg: function (url, num) {
                     if (this.isDisable) {
                         this.setTimeFlag()
