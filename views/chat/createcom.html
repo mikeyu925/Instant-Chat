@@ -4,10 +4,15 @@
 
 <head>
     {{template "/chat/head.shtml"}}
-
+<!--    <style>-->
+<!--        .mui-content{-->
+<!--            background: #0d6aad;-->
+<!--        }-->
+<!--    </style>-->
 </head>
 
 <body>
+<!--当win为community时显示-->
     <div v-show="win=='community'">
         <header class="mui-bar mui-bar-nav">
             <a class="mui-icon mui-icon-left-nav mui-pull-left" @click="goBack()"></a>
@@ -22,7 +27,7 @@
                             class="mui-input-clear mui-input" placeholder="请输入群名称">
 
                         <div class="profile">
-                            <div>更换头像</div>
+                            <div>设置头像</div>
                             <div class="mui-media-body">
                                 <img id="icon" :src="com.icon || '/asset/images/avatar0.png'" style="border-radius:50%;"
                                     class="mui-media-object mui-pull-right head-img">
@@ -69,63 +74,6 @@
 
 </html>
 <script>
-    // function uploadthis(dom){
-    //     var data = new FormData();
 
-    //     for(let file of dom.files){
-    //         data.append('file',file);
-    //     }
-
-    //     let xhr = new XMLHttpRequest();
-    //     xhr.onreadystatechange = function(){
-    //         if(xhr.readyState == 4 && xhr.status==200){
-
-    //             var res = JSON.parse(xhr.responseText);
-    //             if(res.code!=0){
-    //                 mui.toast(res.msg)
-    //             }else{
-    //                 app.com.icon = res.data;
-    //                 mui.toast("上传成功")
-    //             }
-
-    //         }
-    //     };
-    //     xhr.open('POST','/attach/upload');
-    //     xhr.send(data)
-    //     }
-    // var app=new Vue(
-    //         {
-    //             el:"#pageapp",
-    //             data:{
-    //                 com:{
-    //                     name:"",
-    //                     cate:0,
-    //                     memo:"",
-    //                     icon:"/asset/images/community.png",
-    //                     ownerid:0
-    //                 },
-
-    //             },
-    //             created:function(){
-    //               this.com.ownerid=userId();
-    //             },
-    //             methods:{
-    //                 createcommunity:function(){
-    //                     if(!this.com.name){
-    //                         mui.toast("请填写名称")
-    //                         return
-    //                     }
-    //                     post("contact/createcommunity",this.com,function(res){
-    //                         if(res.code==0){
-    //                             mui.toast("创建成功");
-    //                         }else{
-    //                             mui.toast(res.msg);
-    //                         }
-    //                     })
-    //                 },
-
-    //             }
-    //         }
-    // )
 </script>
 {{end}}

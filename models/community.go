@@ -1,35 +1,43 @@
 package models
 
 import (
+	"IM/utils"
+	"fmt"
 	"gorm.io/gorm"
 )
 
+// 群结构
 type Community struct {
 	gorm.Model
-	Name    string
-	OwnerId uint
-	Img     string
-	Desc    string
+	Name    string // 群名
+	OwnerId uint   // 创建者
+	Img     string // 群头像
+	Desc    string // 群描述
 }
 
-/*
+func (table *Community) TableName() string {
+	return "community"
+}
+
 func CreateCommunity(community Community) (int, string) {
+	// 开启事务
 	tx := utils.DB.Begin()
-	//事务一旦开始，不论什么异常最终都会 Rollback
 	defer func() {
+		//事务一旦开始，不论什么异常最终都会 Rollback
 		if r := recover(); r != nil {
 			tx.Rollback()
 		}
 	}()
 
 	if len(community.Name) == 0 {
-		return -1, "群名称不能为空"
+		return -1, "群名称不能为空，请输入"
 	}
 	if community.OwnerId == 0 {
 		return -1, "请先登录"
 	}
+	// 出现中文字段插入失败
 	if err := utils.DB.Create(&community).Error; err != nil {
-		fmt.Println(err)
+		fmt.Println(string(err.Error()))
 		tx.Rollback()
 		return -1, "建群失败"
 	}
@@ -41,10 +49,9 @@ func CreateCommunity(community Community) (int, string) {
 		tx.Rollback()
 		return -1, "添加群关系失败"
 	}
-
+	// 提交事务
 	tx.Commit()
 	return 0, "建群成功"
-
 }
 
 func LoadCommunity(ownerId uint) ([]*Community, string) {
@@ -60,7 +67,5 @@ func LoadCommunity(ownerId uint) ([]*Community, string) {
 	for _, v := range data {
 		fmt.Println(v)
 	}
-	//utils.DB.Where()
 	return data, "查询成功"
 }
-*/

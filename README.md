@@ -39,3 +39,49 @@ error]: dial tcp :6379: connect: connection refused
 
 
 ---
+
+
+Mysql：Incorrect string value: '\xE4\xBA\xA4\xE6\xB5\x81...' for column 'name' at row 1
+
+> 应该是插入的数据有中午，不支持，而导致的，尝试了下全英文插入，可以插入
+> 看了下建表时的语句:
+> ```sql
+> CREATE TABLE `community` (
+> `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+> `created_at` datetime(3) DEFAULT NULL,
+> `updated_at` datetime(3) DEFAULT NULL,
+> `deleted_at` datetime(3) DEFAULT NULL,
+> `name` longtext,
+> `owner_id` bigint(20) unsigned DEFAULT NULL,
+> `img` longtext,
+> `desc` longtext,
+> PRIMARY KEY (`id`),
+> KEY `idx_community_deleted_at` (`deleted_at`)
+> ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+> ```
+>
+> 因为一些一键安装包的环境, `my.ini` 默认配置的字符集是 `latin1` 或者其他, 如果此时一旦不注意, 使用sql语句去创建数据库, 表 默认都是 `latin1`, 因为有些字符集是不能存储中文的,如果需要存储中文, 需要使用GBK,utf8...等字符集
+解决方案：
+
+修改字符集：
+
+- 数据库
+
+  ```sql
+  ALTER DATABASE `test_db` CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
+  ```
+
+- 数据表
+
+  ```sql
+  ALTER TABLE `test_db`.`user` CHARACTER SET = utf8mb4, COLLATE = utf8mb4_bin;
+  ```
+
+- 字段
+
+  ```sql
+  ALTER TABLE `test_db`.`username`  MODIFY COLUMN `password` varchar(30)  CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+  ```
+
+  
+

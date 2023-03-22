@@ -266,22 +266,9 @@ func SearchFriends(c *gin.Context) {
 	utils.RespOKList(c.Writer, users, len(users))
 }
 
-/*
-func RedisMsg(c *gin.Context) {
-	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
-	userIdB, _ := strconv.Atoi(c.PostForm("userIdB"))
-	start, _ := strconv.Atoi(c.PostForm("start"))
-	end, _ := strconv.Atoi(c.PostForm("end"))
-	isRev, _ := strconv.ParseBool(c.PostForm("isRev"))
-	res := models.RedisMsg(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev)
-	utils.RespOKList(c.Writer, "ok", res)
-}
-
-
 func AddFriend(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
 	targetName := c.Request.FormValue("targetName")
-	//targetId, _ := strconv.Atoi(c.Request.FormValue("targetId"))
 	code, msg := models.AddFriend(uint(userId), targetName)
 	if code == 0 {
 		utils.RespOK(c.Writer, code, msg)
@@ -290,7 +277,7 @@ func AddFriend(c *gin.Context) {
 	}
 }
 
-// 新建群
+// 创建群聊
 func CreateCommunity(c *gin.Context) {
 	ownerId, _ := strconv.Atoi(c.Request.FormValue("ownerId"))
 	name := c.Request.FormValue("name")
@@ -312,7 +299,6 @@ func CreateCommunity(c *gin.Context) {
 // 加载群列表
 func LoadCommunity(c *gin.Context) {
 	ownerId, _ := strconv.Atoi(c.Request.FormValue("ownerId"))
-	//	name := c.Request.FormValue("name")
 	data, msg := models.LoadCommunity(uint(ownerId))
 	if len(data) != 0 {
 		utils.RespList(c.Writer, 0, data, msg)
@@ -320,6 +306,24 @@ func LoadCommunity(c *gin.Context) {
 		utils.RespFail(c.Writer, msg)
 	}
 }
+
+/*
+func RedisMsg(c *gin.Context) {
+	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
+	userIdB, _ := strconv.Atoi(c.PostForm("userIdB"))
+	start, _ := strconv.Atoi(c.PostForm("start"))
+	end, _ := strconv.Atoi(c.PostForm("end"))
+	isRev, _ := strconv.ParseBool(c.PostForm("isRev"))
+	res := models.RedisMsg(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev)
+	utils.RespOKList(c.Writer, "ok", res)
+}
+
+
+
+
+
+
+
 
 // 加入群 userId uint, comId uint
 func JoinGroups(c *gin.Context) {

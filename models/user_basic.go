@@ -59,6 +59,7 @@ func FindUserByNameAndPwd(name string, password string) UserBasic {
 	return user
 }
 
+// 通过名字查找用户
 func FindUserByName(name string) UserBasic {
 	user := UserBasic{}
 	utils.DB.Where("name = ?", name).First(&user)
@@ -84,9 +85,9 @@ func UpdateUser(user UserBasic) *gorm.DB {
 	return utils.DB.Model(&user).Updates(UserBasic{Name: user.Name, PassWord: user.PassWord, Phone: user.Phone, Email: user.Email, Avatar: user.Avatar})
 }
 
-// 查找某个用户
-func FindByID(id uint) UserBasic {
-	user := UserBasic{}
-	utils.DB.Where("id = ?", id).First(&user)
-	return user
-}
+//// 通过Id 查找某个用户
+//func FindByID(id uint) UserBasic {
+//	user := UserBasic{}
+//	utils.DB.Where("id = ?", id).First(&user)
+//	return user
+//}

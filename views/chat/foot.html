@@ -7,6 +7,7 @@
             }
         })
     }
+
     //上传图片 创建群
     function uploadthis(dom) {
         uploadfile("attach/upload", dom, function (res) {
@@ -16,6 +17,7 @@
             }
         })
     }
+
     //维护用户头像
     function uploadUserInfo(dom) {
         uploadfile("attach/upload", dom, function (res) {
@@ -375,7 +377,8 @@
                         this.setTimeFlag()
                         //console.log(user)
                         this.win = "single";
-                        this.title = "和" + user.Name + "聊天中";
+                        // this.title = "和" + user.Name + "聊天中";
+                        this.title = user.Name;
                         this.otherAvatar = user.Avatar;
                         this.msgcontext.TargetId = parseInt(user.ID);
                         this.msgcontext.Type = 1;
@@ -550,7 +553,6 @@
 
                 //新建群提交
                 createcommunity() {
-                    //console.log("createcommunity")
                     this.com.ownerId = userId()
                     console.log(this.com)
                     util.post("/contact/createCommunity", this.com).then(res => {
@@ -558,13 +560,14 @@
                         if (res.Code != 0) {
                             mui.toast(res.Msg)
                         } else {
-                            //location.replace("localhost:8081")
-                            //location.href = "/"
                             mui.toast("建群成功")
-                            this.loadcommunitys();
-                            //goBack()
+                            this.loadcommunitys(); // 加载群聊
                         }
                     })
+                },
+                //回到聊天首页
+                goBack() {
+                    this.win = "main"
                 },
                 updateUserInfo() {
                     //console.log("createcommunity")
@@ -586,13 +589,6 @@
                     })
                 },
 
-
-
-                //回到聊天首页
-                goBack() {
-                    this.win = "main"
-                },
-
                 _joincomunity: function (dstobj) {
                     if (this.isDisable) {
                         this.setTimeFlag();
@@ -600,9 +596,8 @@
                         console.log(that);
                         post("contact/joinGroup", { comId: dstobj, "userId": userId() }, function (res) {
                             if (res.Code == 0) {
-                                mui.toast("添加成功");
-
-                                that.loadcommunitys();
+                                mui.toast("加群成功");
+                                that.loadcommunitys(); // 加载群列表
                             } else {
                                 mui.toast(res.Msg);
                             }
