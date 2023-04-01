@@ -337,7 +337,7 @@
                         this.webSocket.send(JSON.stringify(msg))
                     }
                 },
-                // 发送语言
+                // 发送语音
                 sendaudiomsg: function (url, num) {
                     if (this.isDisable) {
                         this.setTimeFlag()
@@ -443,14 +443,13 @@
                         this.showmsg(user, data)
                         this.friends.map((item) => {
                             if (item.ID == data.userId) {
-                                // 1文字 2表情包 3图片 4音频
-                                if (data.Media === 1) {
+                                if (data.Media === 1) {// 1文字
                                     item.memo = data.Content
-                                } else if (data.Media === 2) {
+                                } else if (data.Media === 2) { // 2表情包
                                     item.memo = data.Url
-                                } else if (data.Media === 3) {
+                                } else if (data.Media === 3) { // 3图片
                                     item.memo = "[语音]"
-                                } else if (data.Media === 4) {
+                                } else if (data.Media === 4) { // 4音频
                                     item.memo = "[图片]"
                                 }
                             }
@@ -526,14 +525,14 @@
                 },
                 _addfriend: function (dstobj) {
                     //防止一次点击 穿透访问多次
-                    if (this.isDisable) {
-                        this.setTimeFlag()
-                        //console.log("_addfriend....")
+                    if (this.isDisable) { // 如果可以发起请求
+                        this.setTimeFlag() // set isDisable
                         var that = this
+                        // 发起添加好友请求
                         post("contact/addfriend", { targetName: dstobj, userId: userId() }, function (res) {
                             if (res.Code == 0) {
                                 mui.toast("添加成功");
-                                that.loadfriends();
+                                that.loadfriends(); // 加载好友列表
                             } else {
                                 mui.toast(res.Msg);
                             }
@@ -562,6 +561,7 @@
                         } else {
                             mui.toast("建群成功")
                             this.loadcommunitys(); // 加载群聊
+                            this.goBack()
                         }
                     })
                 },
@@ -629,7 +629,7 @@
                     this.isDisable = false;
                     setTimeout(() => {
                         this.isDisable = true;
-                    }, 100)
+                    }, 10) // 10 毫秒后可以再次点击
                 },
                 heartbeat() {
                     if (this.webSocket.readyState == 1) {  //失去连接 3

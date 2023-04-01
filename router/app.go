@@ -12,8 +12,8 @@ func Router() *gin.Engine {
 	r := gin.Default()
 	// 加载静态资源
 	r.Static("/asset", "asset/")
+	r.StaticFile("/favicon.ico", "asset/images/favicon.ico")
 	r.LoadHTMLGlob("views/**/*")
-	//r.StaticFile("/favicon.ico", "asset/images/favicon.ico")
 	//r.StaticFS()
 
 	// swagger
@@ -33,6 +33,7 @@ func Router() *gin.Engine {
 	r.POST("/user/createUser", service.CreateUser)
 	r.POST("/user/updateUser", service.UpdateUser)
 	r.POST("/user/findUserByNameAndPwd", service.FindUserByNameAndPwd)
+	r.POST("/user/find", service.FindByID)
 	//添加好友
 	r.POST("/contact/addfriend", service.AddFriend)
 	//发送消息
@@ -41,6 +42,8 @@ func Router() *gin.Engine {
 	r.POST("/contact/createCommunity", service.CreateCommunity)
 	// 加载群列表
 	r.POST("/contact/loadcommunity", service.LoadCommunity)
+	// 加载群
+	r.POST("/contact/joinGroup", service.JoinGroups)
 	//上传文件
 	r.POST("/attach/upload", service.Upload)
 

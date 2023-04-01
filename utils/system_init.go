@@ -62,6 +62,7 @@ func InitRedis() {
 	pong, err := RDB.Ping(context.Background()).Result()
 	if err != nil {
 		fmt.Println("init redis error : ", err)
+		panic(err)
 	} else {
 		fmt.Println("init redis success : ", pong)
 	}

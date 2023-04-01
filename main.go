@@ -10,5 +10,5 @@ func main() {
 	utils.InitMySQL()
 	utils.InitRedis()
 	r := router.Router()
-	r.Run() // listen and serve
+	r.Run()
 }

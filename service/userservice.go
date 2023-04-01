@@ -307,6 +307,27 @@ func LoadCommunity(c *gin.Context) {
 	}
 }
 
+// 加入群 userId uint, comId uint
+func JoinGroups(c *gin.Context) {
+	// 获取申请加入者id
+	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
+	// 群id
+	comId := c.Request.FormValue("comId")
+
+	//	name := c.Request.FormValue("name")
+	data, msg := models.JoinGroup(uint(userId), comId)
+	if data == 0 {
+		utils.RespOK(c.Writer, data, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+}
+func FindByID(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
+	data := models.FindByID(uint(userId))
+	utils.RespOK(c.Writer, data, "ok")
+}
+
 /*
 func RedisMsg(c *gin.Context) {
 	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
@@ -319,31 +340,4 @@ func RedisMsg(c *gin.Context) {
 }
 
 
-
-
-
-
-
-
-// 加入群 userId uint, comId uint
-func JoinGroups(c *gin.Context) {
-	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
-	comId := c.Request.FormValue("comId")
-
-	//	name := c.Request.FormValue("name")
-	data, msg := models.JoinGroup(uint(userId), comId)
-	if data == 0 {
-		utils.RespOK(c.Writer, data, msg)
-	} else {
-		utils.RespFail(c.Writer, msg)
-	}
-}
-
-func FindByID(c *gin.Context) {
-	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
-
-	//	name := c.Request.FormValue("name")
-	data := models.FindByID(uint(userId))
-	utils.RespOK(c.Writer, data, "ok")
-}
 */

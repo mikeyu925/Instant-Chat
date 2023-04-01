@@ -35,7 +35,7 @@ func CreateCommunity(community Community) (int, string) {
 	if community.OwnerId == 0 {
 		return -1, "请先登录"
 	}
-	// 出现中文字段插入失败
+	// 出现中文字段插入失败 ==> 修改数据库字符集
 	if err := utils.DB.Create(&community).Error; err != nil {
 		fmt.Println(string(err.Error()))
 		tx.Rollback()
@@ -64,8 +64,8 @@ func LoadCommunity(ownerId uint) ([]*Community, string) {
 
 	data := make([]*Community, 10)
 	utils.DB.Where("id in ?", objIds).Find(&data)
-	for _, v := range data {
-		fmt.Println(v)
-	}
+	//for _, v := range data {
+	//	fmt.Println(v)
+	//}
 	return data, "查询成功"
 }

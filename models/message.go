@@ -231,9 +231,48 @@ func dispatch(data []byte) {
 		fmt.Println("dispatch  data :", string(data))
 		sendMsg(msg.TargetId, data)
 	case GroupChat: //群发
-		//sendGroupMsg(msg.TargetId, data) //发送的群ID ，消息内容
+		sendGroupMsg(msg.TargetId, data) //发送的群ID ，消息内容
 		// case 4: // 心跳
 		// 	node.Heartbeat()
+	}
+}
+
+// 将用户userid加入群comid/群名或者群id => 相当于创建了一个关系contact
+func JoinGroup(userId uint, comId string) (int, string) {
+	contact := Contact{}
+	contact.OwnerId = userId
+	//contact.TargetId = comId
+	contact.Type = 2
+	community := Community{}
+
+	// 查询群是否存在「通过群名或者群id」
+	utils.DB.Where("id=? or name=?", comId, comId).Find(&community)
+	if community.Name == "" {
+		return -1, "没有找到群"
+	}
+	// 拿出群id，应该是用查找到的群id去找contact
+	utils.DB.Where("owner_id=? and target_id=? and type =2 ", userId, community.ID).Find(&contact)
+
+	//utils.DB.Where("owner_id=? and target_id=? and type =2 ", userId, comId).Find(&contact)
+
+	if !contact.CreatedAt.IsZero() {
+		return -1, "已加过此群"
+	} else {
+		contact.TargetId = community.ID
+		utils.DB.Create(&contact)
+		return 0, "加群成功"
+	}
+}
+
+func sendGroupMsg(targetId int64, msg []byte) {
+	fmt.Println("开始群发消息")
+	// 通过群id找到所有用户的信息
+	userIds := SearchUserByGroupId(uint(targetId))
+	for i := 0; i < len(userIds); i++ {
+		//排除给自己的
+		if targetId != int64(userIds[i]) {
+			sendMsg(int64(userIds[i]), msg)
+		}
 	}
 }
 

@@ -11,10 +11,10 @@ import (
 
 type UserBasic struct {
 	gorm.Model
-	Name          string
-	PassWord      string
+	Name          string // 名字
+	PassWord      string // 密码
 	Phone         string `valid:"matches(^1[3-9]{1}\\d{9}$)"` // 正则表达式匹配
-	Email         string `valid:"email"`
+	Email         string `valid:"email"`                      // 邮箱
 	Avatar        string //头像
 	Identity      string
 	ClientIp      string
@@ -66,6 +66,22 @@ func FindUserByName(name string) UserBasic {
 	return user
 }
 
+func FindUserByEmail(email string) *gorm.DB {
+	user := UserBasic{}
+	return utils.DB.Where("email = ?", email).First(&user)
+}
+
+func UpdateUser(user UserBasic) *gorm.DB {
+	return utils.DB.Model(&user).Updates(UserBasic{Name: user.Name, PassWord: user.PassWord, Phone: user.Phone, Email: user.Email, Avatar: user.Avatar})
+}
+
+// 通过Id 查找某个用户
+func FindByID(id uint) UserBasic {
+	user := UserBasic{}
+	utils.DB.Where("id = ?", id).First(&user)
+	return user
+}
+
 func FindUserById(id string) UserBasic {
 	user := UserBasic{}
 	utils.DB.Where("id = ?", id).First(&user)
@@ -76,18 +92,3 @@ func FindUserByPhone(phone string) *gorm.DB {
 	user := UserBasic{}
 	return utils.DB.Where("Phone = ?", phone).First(&user)
 }
-func FindUserByEmail(email string) *gorm.DB {
-	user := UserBasic{}
-	return utils.DB.Where("email = ?", email).First(&user)
-}
-
-func UpdateUser(user UserBasic) *gorm.DB {
-	return utils.DB.Model(&user).Updates(UserBasic{Name: user.Name, PassWord: user.PassWord, Phone: user.Phone, Email: user.Email, Avatar: user.Avatar})
-}
-
-//// 通过Id 查找某个用户
-//func FindByID(id uint) UserBasic {
-//	user := UserBasic{}
-//	utils.DB.Where("id = ?", id).First(&user)
-//	return user
-//}

@@ -92,7 +92,8 @@ func AddFriend(userId uint, targetName string) (int, string) {
 
 func SearchUserByGroupId(communityId uint) []uint {
 	contacts := make([]Contact, 0)
-	objIds := make([]uint, 0)
+	objIds := make([]uint, 0) // 所有用户id
+	// 条件查找 群id 并且 类型为群
 	utils.DB.Where("target_id = ? and type=2", communityId).Find(&contacts)
 	for _, v := range contacts {
 		objIds = append(objIds, uint(v.OwnerId))
