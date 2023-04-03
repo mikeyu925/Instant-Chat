@@ -8,6 +8,7 @@ import (
 	"github.com/fatih/set"
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 	"net"
 	"net/http"
@@ -53,6 +54,7 @@ func (table *Message) TableName() string {
 	return "message"
 }
 
+// 连接结点
 type Node struct {
 	Conn          *websocket.Conn //连接
 	Addr          string          //客户端地址
@@ -147,9 +149,9 @@ func recvProc(node *Node) {
 			fmt.Println(err)
 		}
 		//心跳检测 msg.Media == -1 || msg.Type == 3
-		if msg.Type == 3 {
-			//currentTime := uint64(time.Now().Unix())
-			//node.Heartbeat(currentTime)
+		if msg.Type == HeartBeat {
+			currentTime := uint64(time.Now().Unix())
+			node.Heartbeat(currentTime)
 		} else {
 			dispatch(data)
 			broadMsg(data) //todo 将消息广播到局域网
@@ -232,8 +234,8 @@ func dispatch(data []byte) {
 		sendMsg(msg.TargetId, data)
 	case GroupChat: //群发
 		sendGroupMsg(msg.TargetId, data) //发送的群ID ，消息内容
-		// case 4: // 心跳
-		// 	node.Heartbeat()
+		//case HeartBeat: // 心跳
+		//	node.Heartbeat()
 	}
 }
 
@@ -315,4 +317,80 @@ func sendMsg(userId int64, msg []byte) {
 		fmt.Println(e)
 	}
 	fmt.Println(ress)
+}
+
+// 每隔一段时间进行超时连接清理
+func CleanConnection(param interface{}) (result bool) {
+	result = true
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("cleanConnection err", r)
+		}
+	}()
+	//fmt.Println("定时任务,清理超时连接 ", param)
+	//node.IsHeartbeatTimeOut()
+	currentTime := uint64(time.Now().Unix()) // 当前时间获取
+	for i := range clientMap {               // 遍历所有连接，关闭超时连接
+		node := clientMap[i]
+		if node.IsHeartbeatTimeOut(currentTime) {
+			node.Conn.Close()
+			// 应该把当前连接从clientMap移除?
+			//delete(clientMap, i)
+		}
+	}
+	return result
+}
+
+// 更新用户心跳
+func (node *Node) Heartbeat(currentTime uint64) {
+	node.HeartbeatTime = currentTime
+	return
+}
+
+// 用户心跳是否超时
+func (node *Node) IsHeartbeatTimeOut(currentTime uint64) (timeout bool) {
+	if node.HeartbeatTime+viper.GetUint64("timeout.HeartbeatMaxTime") <= currentTime {
+		fmt.Println(node.Addr, ": 心跳超时..... 关闭连接：")
+		timeout = true
+	}
+	return
+}
+
+// 获取缓存里面的消息
+func RedisMsg(userIdA int64, userIdB int64, start int64, end int64, isRev bool) []string {
+	rwLocker.RLock()
+	//node, ok := clientMap[userIdA]
+	rwLocker.RUnlock()
+	//jsonMsg := Message{}
+	//json.Unmarshal(msg, &jsonMsg)
+	ctx := context.Background()
+	userIdStr := strconv.Itoa(int(userIdA))
+	targetIdStr := strconv.Itoa(int(userIdB))
+	var key string
+	if userIdA > userIdB {
+		key = "msg_" + targetIdStr + "_" + userIdStr
+	} else {
+		key = "msg_" + userIdStr + "_" + targetIdStr
+	}
+	//key = "msg_" + userIdStr + "_" + targetIdStr
+	//rels, err := utils.Red.ZRevRange(ctx, key, 0, 10).Result()  //根据score倒叙
+
+	var rels []string
+	var err error
+	if isRev {
+		rels, err = utils.RDB.ZRange(ctx, key, start, end).Result()
+	} else {
+		rels, err = utils.RDB.ZRevRange(ctx, key, start, end).Result()
+	}
+	if err != nil {
+		fmt.Println(err) //没有找到
+	}
+	// 发送推送消息
+	/**
+	// 后台通过websoket 推送消息
+	for _, val := range rels {
+		fmt.Println("sendMsg >>> userID: ", userIdA, "  msg:", val)
+		node.DataQueue <- []byte(val)
+	}**/
+	return rels
 }

@@ -328,7 +328,6 @@ func FindByID(c *gin.Context) {
 	utils.RespOK(c.Writer, data, "ok")
 }
 
-/*
 func RedisMsg(c *gin.Context) {
 	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
 	userIdB, _ := strconv.Atoi(c.PostForm("userIdB"))
@@ -338,6 +337,3 @@ func RedisMsg(c *gin.Context) {
 	res := models.RedisMsg(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev)
 	utils.RespOKList(c.Writer, "ok", res)
 }
-
-
-*/

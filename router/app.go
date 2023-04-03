@@ -47,5 +47,7 @@ func Router() *gin.Engine {
 	//上传文件
 	r.POST("/attach/upload", service.Upload)
 
+	// 缓存
+	r.POST("/user/redisMsg", service.RedisMsg)
 	return r
 }

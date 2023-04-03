@@ -6,3 +6,12 @@ redis:
   DB: 0
   poolSize: 30
   miniIdleConn: 30
+oss:
+  Endpoint: "https://oss-cn-hangzhou.aliyuncs.com"
+  AccessKeyId: "LTAI5tJXa37nNG3aqWfrreC2"
+  AccessKeySecret: "T2LiBvRVCvQfb3l3gvAVFOfYPBBKnl"
+  Bucket: "easychat-fish"
+timeout:
+  DelayHeartbeat: "20"
+  HeartbeatHz: "5"
+  HeartbeatMaxTime: "60"

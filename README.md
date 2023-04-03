@@ -12,6 +12,38 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 
 
 
+
+
+#### 性能调优
+
+---
+
+- 阿里云OSS「对象存储服务」存储图片：文件比较多，这样就不会占用本地资源了
+
+  > 阿里云OSS特点：海量、安全、成本低、告诉、可靠，同时提供了丰富的SDK，针对上传文件就有简单上传、分片上传、断点续传上传等
+  >
+  > 注：也不贵，搞了个半年50G的5块钱
+  >
+  > ![image-20230401223140305](./README.assets/image-20230401223140305.png)
+  >
+  > 贴一个学习教程：`https://help.aliyun.com/document_detail/31847.html`
+  >
+  > 可以很方便的上传一个文件
+  >
+  > ![image-20230401231115834](./README.assets/image-20230401231115834.png)
+
+- 心跳检测：用户没有上线，就不推送消息
+
+  > websocket是长连接，不用频繁创建连接，当用户特别多的情况下，会影响性能。当用户不在线，则将其移除推送消息的队列
+  >
+  > - 页面定时发送一个请求，更新生命时长。在线用户加入Redis，同时设置存活时长
+
+- 
+
+
+
+
+
 #### 未来改进
 
 ---
@@ -101,6 +133,19 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 >
 > <img src="./README.assets/image-20230401152810182.png" alt="image-20230401152810182" style="zoom:50%;" />
 
+---
+
+ 前端发送图片后OSS服务器以及保存图片，但是前端显示失败
+
+> Debug后发现是后端返回的url拼接方式有问题
+>
+> ```go
+> 	endpoint := viper.GetString("oss.EndPoint")
+> 	endpoint = endpoint[8:]
+> 	bucketName := viper.GetString("oss.Bucket")
+> 	url := "https://" + bucketName + "." + endpoint + "/" + fileName
+> ```
+
 
 
 
@@ -175,4 +220,16 @@ Mysql：Incorrect string value: '\xE4\xBA\xA4\xE6\xB5\x81...' for column 'name' 
 >   ALTER TABLE `test_db`.`username`  MODIFY COLUMN `password` varchar(30)  CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 >   ```
 >
+
+---
+
+包引入循环依赖问题：
+
+<img src="./README.assets/image-20230403102043616.png" alt="image-20230403102043616" style="zoom:50%;" />
+
+> golang 不允许循环 import package, 如果检测 import cycle, 会在编译时报错，通常 import cycle 是因为错误或包的规划问题
+>
+> 解决办法：
+>
+> 创建一个中间包，然后都引入该包
 
