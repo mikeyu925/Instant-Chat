@@ -12,6 +12,7 @@ oss:
   AccessKeySecret: "T2LiBvRVCvQfb3l3gvAVFOfYPBBKnl"
   Bucket: "easychat-fish"
 timeout:
-  DelayHeartbeat: "20"
-  HeartbeatHz: "5"
-  HeartbeatMaxTime: "60"
+  DelayHeartbeat: 20
+  HeartbeatHz: 5
+  HeartbeatMaxTime: 60
+  RedisOnlineTime: 4  # 缓存的在线用户时长，单位小时

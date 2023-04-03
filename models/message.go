@@ -115,8 +115,8 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	go recvProc(node)
 
 	//7.加入在线用户到缓存
-	//SetUserOnlineInfo("online_"+Idstr, []byte(node.Addr), time.Duration(viper.GetInt("timeout.RedisOnlineTime"))*time.Hour)
-	sendMsg(userId, []byte("欢迎进入聊天系统"))
+	SetUserOnlineInfo("online_"+Idstr, []byte(node.Addr), time.Duration(viper.GetInt("timeout.RedisOnlineTime"))*time.Hour)
+	//sendMsg(userId, []byte("欢迎进入聊天系统"))
 }
 
 // 发送线程
