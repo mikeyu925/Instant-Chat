@@ -9,46 +9,48 @@ import (
 )
 
 func Router() *gin.Engine {
-	r := gin.Default()
+
+	r := gin.Default() // 初始化 gin 引擎
 	// 加载静态资源
-	r.Static("/asset", "asset/")
-	r.StaticFile("/favicon.ico", "asset/images/favicon.ico")
-	r.LoadHTMLGlob("views/**/*")
-	//r.StaticFS()
+	{
+		r.Static("/asset", "asset/")
+		r.StaticFile("/favicon.ico", "asset/images/favicon.ico")
+		r.LoadHTMLGlob("views/**/*")
+	}
 
 	// swagger
 	docs.SwaggerInfo.BasePath = ""
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	// 首页
-	r.GET("/", service.GetIndex)
+
+	r.GET("/", service.GetIndex) // 首页
 	r.GET("/index", service.GetIndex)
 	r.GET("/toRegister", service.ToRegister)
 	r.GET("/toChat", service.ToChat)
 	r.GET("/chat", service.Chat)
 	r.POST("/searchFriends", service.SearchFriends)
+	r.POST("/attach/upload", service.Upload) //上传文件
 
-	// 用户模块
-	r.POST("/user/getUserList", service.GetUserList)
-	r.POST("/user/deleteUser", service.DeleteUser)
-	r.POST("/user/createUser", service.CreateUser)
-	r.POST("/user/updateUser", service.UpdateUser)
-	r.POST("/user/findUserByNameAndPwd", service.FindUserByNameAndPwd)
-	r.POST("/user/find", service.FindByID)
-	//发送消息
-	r.GET("/user/sendMsg", service.SendMsg)
-	// 缓存
-	r.POST("/user/redisMsg", service.RedisMsg)
+	// 用户模块路由组
+	userRouter := r.Group("/user")
+	{
+		userRouter.POST("/getUserList", service.GetUserList)                   // 获取用户列表
+		userRouter.POST("/deleteUser", service.DeleteUser)                     // 删除用户
+		userRouter.POST("/createUser", service.CreateUser)                     // 创建用户
+		userRouter.POST("/updateUser", service.UpdateUser)                     // 更新用户信息
+		userRouter.POST("/findUserByNameAndPwd", service.FindUserByNameAndPwd) // 登陆
+		userRouter.POST("/find", service.FindByID)                             // 查找用户
+		userRouter.GET("/sendMsg", service.SendMsg)                            //发送消息
+		userRouter.POST("/redisMsg", service.RedisMsg)                         // 缓存
+	}
 
-	//添加好友
-	r.POST("/contact/addfriend", service.AddFriend)
-	//创建群聊
-	r.POST("/contact/createCommunity", service.CreateCommunity)
-	// 加载群列表
-	r.POST("/contact/loadcommunity", service.LoadCommunity)
-	// 加入群组
-	r.POST("/contact/joinGroup", service.JoinGroups)
-	//上传文件
-	r.POST("/attach/upload", service.Upload)
+	// 聊天相关路由组
+	contactRouter := r.Group("/contact")
+	{
+		contactRouter.POST("/addfriend", service.AddFriend)             //添加好友
+		contactRouter.POST("/createCommunity", service.CreateCommunity) //创建群聊
+		contactRouter.POST("/loadcommunity", service.LoadCommunity)     // 加载群列表
+		contactRouter.POST("/joinGroup", service.JoinGroups)            // 加入群组
+	}
 
 	return r
 }
