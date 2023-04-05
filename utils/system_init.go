@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -21,6 +22,7 @@ func InitConfig() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	color.Green("Init Config Successfully!")
 }
 
 var (
@@ -43,10 +45,10 @@ func InitMySQL() {
 		Logger: newLogger,
 	})
 	if err != nil {
-		fmt.Println("连接数据库出错!")
+		color.Red("Connect Mysql Error!")
 		panic(err)
 	}
-	fmt.Println("mysql init finish!")
+	color.Green("Init Mysql Successfully!")
 }
 func InitRedis() {
 	RDB = redis.NewClient(&redis.Options{
@@ -58,10 +60,10 @@ func InitRedis() {
 	})
 	pong, err := RDB.Ping(context.Background()).Result()
 	if err != nil {
-		fmt.Println("init redis error : ", err)
+		color.Red("Init Redis Error : ", err)
 		panic(err)
 	} else {
-		fmt.Println("init redis success : ", pong)
+		color.Green("Init Redis Successfully : %s", pong)
 	}
 }
 

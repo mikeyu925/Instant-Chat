@@ -4,6 +4,7 @@ import (
 	"IM/models"
 	"IM/router"
 	"IM/utils"
+	"github.com/fatih/color"
 	"github.com/spf13/viper"
 	"time"
 )
@@ -32,4 +33,5 @@ func main() {
 //	@Description: 初始化定时器
 func InitTimer() {
 	utils.Timer(time.Duration(viper.GetInt("timeout.DelayHeartbeat"))*time.Second, time.Duration(viper.GetInt("timeout.HeartbeatHz"))*time.Second, models.CleanConnection, "")
+	color.Green("Init Timer Successfully!")
 }

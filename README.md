@@ -33,7 +33,26 @@ if err != nil { // 处理读取配置文件的错误
 }
 ```
 
+---
 
+**fatih/color**
+
+> 参考至：`https://blog.51cto.com/mouday/5668520`
+
+通过第三方库，可以轻松在终端打印不同颜色的信息
+
+```go
+// 直接使用，输出蓝色文字
+color.Blue("hello: %s", "Tom")
+
+// 实例化后使用
+colorPrint := color.New()
+colorPrint.Add(color.FgRed)   // 红色文字
+colorPrint.Add(color.Italic)  // 倾斜
+colorPrint.Add(color.BgGreen) // 绿色背景
+```
+
+---
 
 
 
@@ -304,4 +323,12 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 > 解决办法：
 >
 > 创建一个中间包，然后都引入该包
+
+
+
+
+
+
+
+
 

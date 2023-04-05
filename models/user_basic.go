@@ -19,7 +19,7 @@ type UserBasic struct {
 	Identity      string
 	ClientIp      string
 	ClientPort    string
-	Salt          string
+	Salt          string    // MD5加密用的随机数
 	LoginTime     time.Time `gorm:"default:NULL"`
 	HeartbeatTime time.Time `gorm:"default:NULL"`
 	LoginOutTime  time.Time `gorm:"default:NULL"` // `gorm:"column:login_out_time" json:"login_out_time"`

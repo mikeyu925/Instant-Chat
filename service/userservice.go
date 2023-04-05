@@ -56,6 +56,7 @@ func CreateUser(c *gin.Context) {
 		})
 		return
 	}
+	// 验证两次密码是否相同
 	if password != repassword {
 		c.JSON(200, gin.H{
 			"code":    -1, //  0成功   -1失败
@@ -64,19 +65,17 @@ func CreateUser(c *gin.Context) {
 		})
 		return
 	}
-	// 生成随机数
-	salt := fmt.Sprintf("%06d", rand.Int31())
+
+	salt := fmt.Sprintf("%06d", rand.Int31()) // 生成随机数
 	// md5加密
 	user.PassWord = utils.MakePassword(password, salt) // 存储的是加密后的字符串
-	user.Salt = salt
-	//fmt.Println(user.PassWord)
-
+	user.Salt = salt                                   // 生成的随机数
+	// 设置时间
 	nowTime := time.Now()
 	user.LoginTime = nowTime
 	user.LoginOutTime = nowTime
 	user.HeartbeatTime = nowTime
-
-	// 进行用户注册
+	// 进行用户注册插入Mysql
 	models.CreateUser(user)
 	c.JSON(200, gin.H{
 		"code":    0, //  0成功   -1失败

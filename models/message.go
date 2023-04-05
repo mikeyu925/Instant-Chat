@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/fatih/set"
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
@@ -74,13 +75,9 @@ var rwLocker sync.RWMutex
 // 需要 ：发送者ID ，接受者ID ，消息类型，发送的内容，发送类型
 func Chat(writer http.ResponseWriter, request *http.Request) {
 	//1.  获取参数 并 检验 token 等合法性
-	//token := query.Get("token")
 	query := request.URL.Query()
 	Idstr := query.Get("userId")
 	userId, _ := strconv.ParseInt(Idstr, 10, 64)
-	//msgType := query.Get("type")
-	//targetId := query.Get("targetId")
-	//context := query.Get("context")
 	isvalida := true //checkToke()  待.........
 	conn, err := (&websocket.Upgrader{
 		//token 校验
@@ -167,16 +164,10 @@ func broadMsg(data []byte) {
 	udpsendChan <- data
 }
 
-//func init() {
-//	go udpSendProc()
-//	go udpRecvProc()
-//	fmt.Println("init goroutine successfully!")
-//}
-
 func InitUDPProc() {
 	go udpSendProc()
 	go udpRecvProc()
-	fmt.Println("init goroutine successfully!")
+	color.Green("Init UPD Send/Rec Goroutine Successfully!")
 }
 
 // 完成udp数据发送协程

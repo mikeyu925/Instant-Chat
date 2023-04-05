@@ -19,6 +19,10 @@ func GetIndex(c *gin.Context) {
 	ind.Execute(c.Writer, "index")
 }
 
+// ToRegister
+//
+//	@Description: 返回注册页面
+//	@param c
 func ToRegister(c *gin.Context) {
 	ind, err := template.ParseFiles("views/user/register.html")
 	if err != nil {
@@ -27,7 +31,10 @@ func ToRegister(c *gin.Context) {
 	ind.Execute(c.Writer, "register")
 }
 
-// 登陆之后跳转
+// ToChat
+//
+//	@Description: 登陆成功后跳转至此页面
+//	@param c : context 中包含了userId 和 token
 func ToChat(c *gin.Context) {
 	ind, err := template.ParseFiles("views/chat/index.html",
 		"views/chat/head.html",
@@ -42,7 +49,6 @@ func ToChat(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	// 登陆之后要把userId 和 token 传过来
 	userId, _ := strconv.Atoi(c.Query("userId"))
 	token := c.Query("token")
 
@@ -51,11 +57,7 @@ func ToChat(c *gin.Context) {
 	user.Identity = token
 	// TODO 校验是否合法
 
-	//fmt.Println("ToChat>>>>>>>>", user)
 	ind.Execute(c.Writer, user)
-	// c.JSON(200, gin.H{
-	// 	"message": "welcome !!  ",
-	// })
 }
 
 func Chat(c *gin.Context) {
