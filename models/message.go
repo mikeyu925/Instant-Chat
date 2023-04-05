@@ -167,10 +167,16 @@ func broadMsg(data []byte) {
 	udpsendChan <- data
 }
 
-func init() {
+//func init() {
+//	go udpSendProc()
+//	go udpRecvProc()
+//	fmt.Println("init goroutine successfully!")
+//}
+
+func InitUDPProc() {
 	go udpSendProc()
 	go udpRecvProc()
-	fmt.Println("init goroutine ")
+	fmt.Println("init goroutine successfully!")
 }
 
 // 完成udp数据发送协程

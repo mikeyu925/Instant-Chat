@@ -8,16 +8,28 @@ import (
 	"time"
 )
 
-func main() {
+// init
+//
+//	@Description: 进行一系列初始化任务
+func init() {
 	utils.InitConfig()
 	utils.InitMySQL()
 	utils.InitRedis()
+	models.InitUDPProc()
 	InitTimer()
+}
+
+// main
+//
+//	@Description: 主函数
+func main() {
 	r := router.Router()
 	r.Run(viper.GetString("port.server"))
 }
 
-// 初始化定时器
+// InitTimer
+//
+//	@Description: 初始化定时器
 func InitTimer() {
 	utils.Timer(time.Duration(viper.GetInt("timeout.DelayHeartbeat"))*time.Second, time.Duration(viper.GetInt("timeout.HeartbeatHz"))*time.Second, models.CleanConnection, "")
 }

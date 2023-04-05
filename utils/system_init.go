@@ -14,16 +14,13 @@ import (
 )
 
 func InitConfig() {
-	viper.SetConfigName("app")
-	viper.AddConfigPath("config")
-
+	viper.SetConfigName("app")    // 配置文件名称
+	viper.AddConfigPath("config") // 查找配置文件所在的路径
+	// 查找并读取文件
 	err := viper.ReadInConfig()
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	//fmt.Println("config app:", viper.Get("app"))
-	//fmt.Println("config mysql:", viper.Get("mysql"))
 }
 
 var (

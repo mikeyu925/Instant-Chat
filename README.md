@@ -4,6 +4,41 @@
 
 
 
+#### 技能包++
+
+经过这个项目，又学习到了一些小技能，加油！不断变强！
+
+---
+
+**Viper**
+
+> 参考至：`https://www.liwenzhou.com/posts/Go/viper/`
+
+Viper是适用于Go应用程序的完整配置解决方案。它被设计用于在应用程序中工作，并且可以处理所有类型的配置需求和格式。它支持以下特性：
+
+- 设置默认值
+- 从`JSON`、`TOML`、`YAML`、`HCL`、`envfile`和`Java properties`格式的配置文件读取配置信息
+- 实时监控和重新读取配置文件（可选）
+- 从环境变量中读取
+
+常用操作：
+
+```go
+viper.SetConfigName("config") // 配置文件名称
+viper.AddConfigPath("/etc/appname/")   // 查找配置文件所在的路径
+
+err := viper.ReadInConfig() // 查找并读取配置文件
+if err != nil { // 处理读取配置文件的错误
+	panic(fmt.Errorf("Fatal error config file: %s \n", err))
+}
+```
+
+
+
+
+
+
+
 
 gorm.logger 作用?
 > 开启慢查询日志?
