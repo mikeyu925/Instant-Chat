@@ -301,8 +301,6 @@
                             document.querySelector("#convo .mui-scroll").style.transform = 'translateY(' + 0 + 'px)';
                         }
 
-
-
                         clearTimeout(that.timer)
                     }, 100)
                 },
@@ -365,6 +363,7 @@
                     if (this.isDisable) {
                         //首次读取某个用户的消息记录
                         if (this.isReadRedisMsg.filter(item => item === user.ID).length <= 0) {
+                            // 正序读取
                             post("user/redisMsg", { userIdA: userId(), userIdB: user.ID, start: this.start, end: this.end, isRev: false }, function (res) {
                                 //循环读取的消息记录 并显示
                                 for (var i in res.Total) {

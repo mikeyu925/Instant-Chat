@@ -14,7 +14,7 @@ func main() {
 	utils.InitRedis()
 	InitTimer()
 	r := router.Router()
-	r.Run()
+	r.Run(viper.GetString("port.server"))
 }
 
 // 初始化定时器

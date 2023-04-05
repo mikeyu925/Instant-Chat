@@ -177,7 +177,7 @@ func init() {
 func udpSendProc() {
 	con, err := net.DialUDP("udp", nil, &net.UDPAddr{
 		IP:   net.IPv4(192, 168, 0, 255), // 192.168.31.54
-		Port: 3000,
+		Port: viper.GetInt("port.udp"),
 	})
 	defer con.Close()
 	if err != nil {
@@ -201,7 +201,7 @@ func udpSendProc() {
 func udpRecvProc() {
 	conn, err := net.ListenUDP("udp", &net.UDPAddr{
 		IP:   net.IPv4zero,
-		Port: 3000,
+		Port: viper.GetInt("port.udp"),
 	})
 	if err != nil {
 		fmt.Println(err)
@@ -306,17 +306,45 @@ func sendMsg(userId int64, msg []byte) {
 	} else {
 		key = "msg_" + targetIdStr + "_" + userIdStr
 	}
+	// 查询出所有消息
 	res, err := utils.RDB.ZRevRange(ctx, key, 0, -1).Result()
 	if err != nil {
 		fmt.Println(err)
 	}
-	score := float64(cap(res)) + 1
+	score := float64(cap(res)) + 1                                     // 计算出当前的score
 	ress, e := utils.RDB.ZAdd(ctx, key, &redis.Z{score, msg}).Result() //jsonMsg
 	//res, e := utils.Red.Do(ctx, "zadd", key, 1, jsonMsg).Result() //备用 后续拓展 记录完整msg
 	if e != nil {
 		fmt.Println(e)
 	}
 	fmt.Println(ress)
+}
+
+// 获取缓存里面的消息
+func RedisMsg(userIdA int64, userIdB int64, start int64, end int64, isRev bool) []string {
+	rwLocker.RLock()
+	rwLocker.RUnlock()
+	ctx := context.Background()
+	userIdStr := strconv.Itoa(int(userIdA))
+	targetIdStr := strconv.Itoa(int(userIdB))
+	var key string
+	if userIdA > userIdB {
+		key = "msg_" + targetIdStr + "_" + userIdStr
+	} else {
+		key = "msg_" + userIdStr + "_" + targetIdStr
+	}
+
+	var rels []string
+	var err error
+	if isRev {
+		rels, err = utils.RDB.ZRange(ctx, key, start, end).Result()
+	} else {
+		rels, err = utils.RDB.ZRevRange(ctx, key, start, end).Result()
+	}
+	if err != nil {
+		fmt.Println(err) //没有找到
+	}
+	return rels // 直接返回所有缓存消息，交给前端处理
 }
 
 // 需要重写此方法才能完整的msg转byte[]
@@ -359,43 +387,4 @@ func (node *Node) IsHeartbeatTimeOut(currentTime uint64) (timeout bool) {
 		timeout = true
 	}
 	return
-}
-
-// 获取缓存里面的消息
-func RedisMsg(userIdA int64, userIdB int64, start int64, end int64, isRev bool) []string {
-	rwLocker.RLock()
-	//node, ok := clientMap[userIdA]
-	rwLocker.RUnlock()
-	//jsonMsg := Message{}
-	//json.Unmarshal(msg, &jsonMsg)
-	ctx := context.Background()
-	userIdStr := strconv.Itoa(int(userIdA))
-	targetIdStr := strconv.Itoa(int(userIdB))
-	var key string
-	if userIdA > userIdB {
-		key = "msg_" + targetIdStr + "_" + userIdStr
-	} else {
-		key = "msg_" + userIdStr + "_" + targetIdStr
-	}
-	//key = "msg_" + userIdStr + "_" + targetIdStr
-	//rels, err := utils.Red.ZRevRange(ctx, key, 0, 10).Result()  //根据score倒叙
-
-	var rels []string
-	var err error
-	if isRev {
-		rels, err = utils.RDB.ZRange(ctx, key, start, end).Result()
-	} else {
-		rels, err = utils.RDB.ZRevRange(ctx, key, start, end).Result()
-	}
-	if err != nil {
-		fmt.Println(err) //没有找到
-	}
-	// 发送推送消息
-	/**
-	// 后台通过websoket 推送消息
-	for _, val := range rels {
-		fmt.Println("sendMsg >>> userID: ", userIdA, "  msg:", val)
-		node.DataQueue <- []byte(val)
-	}**/
-	return rels
 }
