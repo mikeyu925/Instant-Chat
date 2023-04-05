@@ -608,14 +608,8 @@
                     var that = this;
                     mui.prompt('', '请输入群号或者群名称', '加群', ['取消', '确认'], function (e) {
                         if (e.index == 1) {
-                            //    if (isNaN(e.value) || e.value <= 0) {
-                            //       mui.toast('格式错误');
-                            //   } else {
-                            //mui.toast(e.value);
                             that._joincomunity(e.value)
-                            // }
                         } else {
-                            //mui.toast('您取消了入库');
                         }
                     }, 'div');
                     document.querySelector('.mui-popup-input input').type = 'text';

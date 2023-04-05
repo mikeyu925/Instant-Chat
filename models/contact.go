@@ -16,7 +16,7 @@ const (
 type Contact struct {
 	gorm.Model
 	OwnerId  uint //谁的关系信息
-	TargetId uint //对应的谁 /群 ID
+	TargetId uint //对应的 用户/群 ID
 	Type     int  //对应的类型  1好友  2群  考虑如何实现黑名单
 	Desc     string
 }
@@ -40,7 +40,7 @@ func SearchFriend(userId uint) []UserBasic {
 	return users
 }
 
-// 添加好友   自己的ID  ， 好友名字「因为开始是不知道对方的Id的」好友的ID
+// 添加好友 userID:自己的ID, targetName:好友名字「因为开始是不知道对方的Id的」好友的ID
 func AddFriend(userId uint, targetName string) (int, string) {
 	// 查找用户名
 	if targetName != "" {
