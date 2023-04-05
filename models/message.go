@@ -42,7 +42,7 @@ type Message struct {
 	Type       MessageType //发送类型  1私聊  2群聊  3心跳
 	Media      InfoType    //消息类型  1文字 2表情包 3语音 4图片
 	Content    string      //消息内容
-	CreateTime uint64      //创建时间
+	CreateTime uint64      //创建时间 ==> 防止发送重复内容数据的覆盖问题
 	ReadTime   uint64      //读取时间
 	Pic        string
 	Url        string
@@ -222,7 +222,7 @@ func udpRecvProc() {
 // 后端调度逻辑处理--> 进行转发
 func dispatch(data []byte) {
 	msg := Message{}
-	msg.CreateTime = uint64(time.Now().Unix())
+	msg.CreateTime = uint64(time.Now().Unix()) // 获得消息的创建时间
 	err := json.Unmarshal(data, &msg)
 	if err != nil {
 		fmt.Println(err)
@@ -286,6 +286,7 @@ func sendMsg(userId int64, msg []byte) {
 
 	jsonMsg := Message{}
 	json.Unmarshal(msg, &jsonMsg)
+	// 获取一个上下文
 	ctx := context.Background()
 	targetIdStr := strconv.Itoa(int(userId))
 	userIdStr := strconv.Itoa(int(jsonMsg.UserId))
@@ -294,14 +295,15 @@ func sendMsg(userId int64, msg []byte) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	// 如果用户在线
 	if r != "" {
 		if ok {
-			fmt.Println("sendMsg >>> userID: ", userId, "  msg:", string(msg))
-			node.DataQueue <- msg
+			fmt.Println("sendMsg >>> ", userId, "  msg:", string(msg))
+			node.DataQueue <- msg // 通过管道发送消息
 		}
 	}
 	var key string
-	if userId > jsonMsg.UserId {
+	if userId > jsonMsg.UserId { // 这样是为了进行方便的渲染
 		key = "msg_" + userIdStr + "_" + targetIdStr
 	} else {
 		key = "msg_" + targetIdStr + "_" + userIdStr
@@ -317,6 +319,11 @@ func sendMsg(userId int64, msg []byte) {
 		fmt.Println(e)
 	}
 	fmt.Println(ress)
+}
+
+// 需要重写此方法才能完整的msg转byte[]
+func (msg Message) MarshalBinary() ([]byte, error) {
+	return json.Marshal(msg)
 }
 
 // 每隔一段时间进行超时连接清理
