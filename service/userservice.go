@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -124,6 +125,7 @@ func UpdateUser(c *gin.Context) {
 	// 读取修改信息
 	user := models.UserBasic{}
 	idStr := c.PostForm("id")
+	id, _ := strconv.Atoi(idStr)
 	// 先判断用户是否存在
 	data := models.FindUserById(idStr)
 	if data.Name == "" { //
@@ -133,15 +135,37 @@ func UpdateUser(c *gin.Context) {
 		})
 		return
 	}
+	// 判断更改的昵称是否存在
+	newName := c.PostForm("name")
+	checkUser := models.FindUserByName(newName)
+	if checkUser.ID != uint(id) {
+		c.JSON(200, gin.H{
+			"code":    -1, //  0成功   -1失败
+			"message": "您想要更改的用户名已经存在！",
+		})
+		return
+	}
+	// 获得新、旧密码
+	oldpwd := c.PostForm("oldpwd")
+	newpwd := c.PostForm("newpwd")
+	// 校验旧密码是否正确
+	md5OldPwd := utils.MakePassword(oldpwd, data.Salt) // 获得加密后的字符串
+	if strings.Compare(md5OldPwd, data.PassWord) != 0 {
+		c.JSON(200, gin.H{
+			"code":    -1, //  0成功   -1失败
+			"message": "旧密码错误",
+		})
+		return
+	}
 
-	id, _ := strconv.Atoi(idStr)
 	user.ID = uint(id)
 	user.Name = c.PostForm("name")
-	pwd := c.PostForm("password")
+	// 生成新密码
+	user.PassWord = utils.MakePassword(newpwd, data.Salt) // 获得加密后的字符串
 	user.Phone = c.PostForm("phone")
 	user.Avatar = c.PostForm("icon")
 	user.Email = c.PostForm("email")
-	fmt.Println("update :", user)
+
 	// 进行格式验证
 	_, err := govalidator.ValidateStruct(user)
 	if err != nil {
@@ -152,8 +176,7 @@ func UpdateUser(c *gin.Context) {
 			"data":    user,
 		})
 	}
-	// 这里salt是个空的！！！！ 需要先查出来 salt
-	user.PassWord = utils.MakePassword(pwd, data.Salt)
+	// 更新用户密码
 	models.UpdateUser(user)
 
 	c.JSON(200, gin.H{

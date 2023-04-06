@@ -39,6 +39,16 @@
                     <input v-model="info.name" id='name' type="text" class="mui-input-clear mui-input"
                         placeholder="请输入用户昵称">
                 </div>
+                <div class="mui-input-row">
+                    <label>旧密码</label>
+                    <input v-model="info.oldpwd" id='oldpwd' type="text" class="mui-input-clear mui-input"
+                           placeholder="请输入旧密码">
+                </div>
+                <div class="mui-input-row">
+                    <label>新密码</label>
+                    <input v-model="info.newpwd" id='newpwd' type="text" class="mui-input-clear mui-input"
+                           placeholder="请输入新密码">
+                </div>
             </div>
             <div class="mui-content-padded">
                 <button @click="updateUserInfo" id='reg'
@@ -51,63 +61,5 @@
 
 </html>
 <script>
-    // function uploadthis(dom){
-    //     var data = new FormData();
-
-    //     for(let file of dom.files){
-    //         data.append('file',file);
-    //     }
-
-    //     let xhr = new XMLHttpRequest();
-    //     xhr.onreadystatechange = function(){
-    //         if(xhr.readyState == 4 && xhr.status==200){
-
-    //             var res = JSON.parse(xhr.responseText);
-    //             if(res.code!=0){
-    //                 mui.toast(res.msg)
-    //             }else{
-    //                 app.com.icon = res.data;
-    //                 mui.toast("上传成功")
-    //             }
-
-    //         }
-    //     };
-    //     xhr.open('POST','/attach/upload');
-    //     xhr.send(data)
-    //     }
-    // var app=new Vue(
-    //         {
-    //             el:"#pageapp",
-    //             data:{
-    //                 com:{
-    //                     name:"",
-    //                     cate:0,
-    //                     memo:"",
-    //                     icon:"/asset/images/community.png",
-    //                     ownerid:0
-    //                 },
-
-    //             },
-    //             created:function(){
-    //               this.com.ownerid=userId();
-    //             },
-    //             methods:{
-    //                 createcommunity:function(){
-    //                     if(!this.com.name){
-    //                         mui.toast("请填写名称")
-    //                         return
-    //                     }
-    //                     post("contact/createcommunity",this.com,function(res){
-    //                         if(res.code==0){
-    //                             mui.toast("创建成功");
-    //                         }else{
-    //                             mui.toast(res.msg);
-    //                         }
-    //                     })
-    //                 },
-
-    //             }
-    //         }
-    // )
 </script>
 {{end}}

@@ -55,7 +55,6 @@ func ToChat(c *gin.Context) {
 	user := models.UserBasic{}
 	user.ID = uint(userId)
 	user.Identity = token
-	// TODO 校验是否合法
 
 	ind.Execute(c.Writer, user)
 }
