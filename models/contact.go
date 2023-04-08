@@ -31,7 +31,7 @@ func SearchFriend(userId uint) []UserBasic {
 	objIds := make([]uint64, 0)
 	// 通过Mysql 查询当前用户的好友信息
 	utils.DB.Where("owner_id = ? and type = ?", userId, _FriendType).Find(&contacts)
-	//utils.DB.Where("owner_id = ? and type = 1", userId).Find(&contacts)
+	// 遍历所有关系，获得targetIDs
 	for _, v := range contacts {
 		objIds = append(objIds, uint64(v.TargetId))
 	}

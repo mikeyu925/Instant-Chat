@@ -27,7 +27,7 @@ func Router() *gin.Engine {
 	r.GET("/toRegister", service.ToRegister) // 返回注册页面
 	r.GET("/toChat", service.ToChat)         // 登陆之后跳转的页面
 	r.GET("/chat", service.Chat)
-	r.POST("/searchFriends", service.SearchFriends)
+
 	r.POST("/attach/upload", service.Upload) //上传文件
 
 	// 用户模块路由组
@@ -39,8 +39,9 @@ func Router() *gin.Engine {
 		userRouter.POST("/updateUser", service.UpdateUser)                     // 更新用户信息
 		userRouter.POST("/findUserByNameAndPwd", service.FindUserByNameAndPwd) // 用户登陆
 		userRouter.POST("/find", service.FindByID)                             // 查找用户
-		userRouter.GET("/sendMsg", service.SendMsg)                            //发送消息
+		userRouter.GET("/sendMsg", service.SendMsg)                            // 发送消息
 		userRouter.POST("/redisMsg", service.RedisMsg)                         // 缓存
+		userRouter.POST("/searchFriends", service.SearchFriends)               // 查找好友
 	}
 
 	// 聊天相关路由组

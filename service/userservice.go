@@ -278,14 +278,13 @@ func SendUserMsg(c *gin.Context) {
 	models.Chat(c.Writer, c.Request)
 }
 
+// SearchFriends
+//
+//	@Description: 查找用户userId的好友
+//	@param c
 func SearchFriends(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Request.FormValue("userId")) // 获取用户id
 	users := models.SearchFriend(uint(id))               // 得到用户的好友信息
-	// c.JSON(200, gin.H{
-	// 	"code":    0, //  0成功   -1失败
-	// 	"message": "查询好友列表成功！",
-	// 	"data":    users,
-	// })
 	utils.RespOKList(c.Writer, users, len(users))
 }
 
