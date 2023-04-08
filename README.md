@@ -330,5 +330,7 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 
 
 
+- Contact.CreateAt.isZero
+
 
 

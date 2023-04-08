@@ -8,17 +8,17 @@ import (
 type RelationType int32
 
 const (
-	Friend RelationType = 1 // 好友
-	Group  RelationType = 2 // 群
+	_FriendType RelationType = 1 // 好友
+	_GroupType  RelationType = 2 // 群
 )
 
 // 用户关系
 type Contact struct {
 	gorm.Model
-	OwnerId  uint //谁的关系信息
-	TargetId uint //对应的 用户/群 ID
-	Type     int  //对应的类型  1好友  2群  考虑如何实现黑名单
-	Desc     string
+	OwnerId  uint   //谁的关系信息
+	TargetId uint   //对应的 用户/群 ID
+	Type     int    //对应的类型  1好友  2群  考虑如何实现黑名单
+	Desc     string // 描述？
 }
 
 func (table *Contact) TableName() string {
@@ -30,7 +30,7 @@ func SearchFriend(userId uint) []UserBasic {
 	contacts := make([]Contact, 0)
 	objIds := make([]uint64, 0)
 	// 通过Mysql 查询当前用户的好友信息
-	utils.DB.Where("owner_id = ? and type = ?", userId, Friend).Find(&contacts)
+	utils.DB.Where("owner_id = ? and type = ?", userId, _FriendType).Find(&contacts)
 	//utils.DB.Where("owner_id = ? and type = 1", userId).Find(&contacts)
 	for _, v := range contacts {
 		objIds = append(objIds, uint64(v.TargetId))
@@ -41,29 +41,38 @@ func SearchFriend(userId uint) []UserBasic {
 }
 
 // 添加好友 userID:自己的ID, targetName:好友名字「因为开始是不知道对方的Id的」好友的ID
+
+// AddFriend
+//
+//	@Description: 添加好友
+//	@param userId 当前用户的id
+//	@param targetName  想要添加好友的名字
+//	@return int  0：成功 -1：失败
+//	@return string 响应信息
 func AddFriend(userId uint, targetName string) (int, string) {
 	// 查找用户名
 	if targetName != "" {
 		targetUser := FindUserByName(targetName) // 通过名字查找用户
-		//fmt.Println(targetUser, " userId        ", )
 		if targetUser.Salt != "" {
 			if targetUser.ID == userId {
 				return -1, "不能添加自己"
 			}
-			contact0 := Contact{} // 查找是否已经是好友关系
+			// 判断是否已经是好友关系
+			contact0 := Contact{}
 			utils.DB.Where("owner_id =?  and target_id =? and type=1", userId, targetUser.ID).Find(&contact0)
 			if contact0.ID != 0 {
 				return -1, "不能重复添加"
 			}
 			// 开启一个事务
 			tx := utils.DB.Begin()
-			//事务一旦开始，不论什么异常最终都会 Rollback
-			defer func() {
+			defer func() { //事务一旦开始，不论什么异常最终都会 Rollback
 				// 如果出现异常就回滚
 				if r := recover(); r != nil {
 					tx.Rollback()
 				}
 			}()
+
+			// 创建一个新的关系
 			contact := Contact{}
 			contact.OwnerId = userId
 			contact.TargetId = targetUser.ID
@@ -83,6 +92,7 @@ func AddFriend(userId uint, targetName string) (int, string) {
 			}
 			// 提交事务
 			tx.Commit()
+
 			return 0, "添加好友成功~"
 		}
 		return -1, "查无此用户!"

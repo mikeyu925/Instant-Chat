@@ -200,6 +200,7 @@ func FindUserByNameAndPwd(c *gin.Context) {
 	name := c.Request.FormValue("name")
 	password := c.Request.FormValue("password")
 
+	// 通过名字查找用户
 	user := models.FindUserByName(name)
 	if user.Name == "" {
 		c.JSON(200, gin.H{
@@ -209,7 +210,7 @@ func FindUserByNameAndPwd(c *gin.Context) {
 		})
 		return
 	}
-
+	// 验证密码
 	flag := utils.ValidPassword(password, user.Salt, user.PassWord)
 	if !flag {
 		c.JSON(200, gin.H{
@@ -288,6 +289,10 @@ func SearchFriends(c *gin.Context) {
 	utils.RespOKList(c.Writer, users, len(users))
 }
 
+// AddFriend
+//
+//	@Description: 添加好友handler函数
+//	@param c
 func AddFriend(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
 	targetName := c.Request.FormValue("targetName")
@@ -299,8 +304,12 @@ func AddFriend(c *gin.Context) {
 	}
 }
 
-// 创建群聊
+// CreateCommunity
+//
+//	@Description: 创建群聊handler
+//	@param c
 func CreateCommunity(c *gin.Context) {
+	// 获取要创建的群信息
 	ownerId, _ := strconv.Atoi(c.Request.FormValue("ownerId"))
 	name := c.Request.FormValue("name")
 	icon := c.Request.FormValue("icon")
@@ -310,6 +319,7 @@ func CreateCommunity(c *gin.Context) {
 	community.Name = name
 	community.Img = icon
 	community.Desc = desc
+	// 创建群
 	code, msg := models.CreateCommunity(community)
 	if code == 0 {
 		utils.RespOK(c.Writer, code, msg)
@@ -318,8 +328,12 @@ func CreateCommunity(c *gin.Context) {
 	}
 }
 
-// 加载群列表
+// LoadCommunity
+//
+//	@Description: 加载群列表
+//	@param c
 func LoadCommunity(c *gin.Context) {
+	// 获取用户id
 	ownerId, _ := strconv.Atoi(c.Request.FormValue("ownerId"))
 	data, msg := models.LoadCommunity(uint(ownerId))
 	if len(data) != 0 {
@@ -329,14 +343,13 @@ func LoadCommunity(c *gin.Context) {
 	}
 }
 
-// 加入群 userId uint, comId uint
+// JoinGroups
+//
+//	@Description: 加入群
+//	@param c
 func JoinGroups(c *gin.Context) {
-	// 获取申请加入者id
-	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
-	// 群id
-	comId := c.Request.FormValue("comId")
-
-	//	name := c.Request.FormValue("name")
+	userId, _ := strconv.Atoi(c.Request.FormValue("userId")) // 获取申请加入者id
+	comId := c.Request.FormValue("comId")                    // 群id
 	data, msg := models.JoinGroup(uint(userId), comId)
 	if data == 0 {
 		utils.RespOK(c.Writer, data, msg)
@@ -347,6 +360,9 @@ func JoinGroups(c *gin.Context) {
 func FindByID(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
 	data := models.FindByID(uint(userId))
+	if data.Name == "" {
+		utils.RespFail(c.Writer, "not find by id")
+	}
 	utils.RespOK(c.Writer, data, "ok")
 }
 

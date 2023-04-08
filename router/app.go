@@ -33,8 +33,8 @@ func Router() *gin.Engine {
 	// 用户模块路由组
 	userRouter := r.Group("/user")
 	{
-		userRouter.POST("/getUserList", service.GetUserList)                   // 获取用户列表
-		userRouter.POST("/deleteUser", service.DeleteUser)                     // 删除用户
+		userRouter.POST("/getUserList", service.GetUserList)                   // 获取用户列表  --- 暂时无用
+		userRouter.POST("/deleteUser", service.DeleteUser)                     // 删除用户  --- 暂时无用
 		userRouter.POST("/createUser", service.CreateUser)                     // 创建「注册」用户
 		userRouter.POST("/updateUser", service.UpdateUser)                     // 更新用户信息
 		userRouter.POST("/findUserByNameAndPwd", service.FindUserByNameAndPwd) // 用户登陆

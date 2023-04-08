@@ -236,21 +236,27 @@ func dispatch(data []byte) {
 	}
 }
 
-// 将 用户userid 加入群 comid/群名或者群id => 相当于创建了一个关系contact
+// JoinGroup
+//
+//	@Description: 通过群id或者群名查找并加入群
+//	@param userId  当前用户userid == 申请加入者
+//	@param comId  群id/群名
+//	@return int  0：成功 -1：失败
+//	@return string  响应信息
 func JoinGroup(userId uint, comId string) (int, string) {
 	contact := Contact{}
 	contact.OwnerId = userId
-	//contact.TargetId = comId
 	contact.Type = 2
-	community := Community{}
 
+	community := Community{}
 	// 查询群是否存在「通过群名或者群id」
 	utils.DB.Where("id=? or name=?", comId, comId).Find(&community)
 	if community.Name == "" {
 		return -1, "没有找到群"
 	}
-	// 拿出群id，应该是用查找到的群id去找contact
-	utils.DB.Where("owner_id=? and target_id=? and type =2 ", userId, community.ID).Find(&contact)
+	// 群存在：拿出群id，应该是用查找到的群id去找contact
+	// 判断是否已经加过此群
+	utils.DB.Where("owner_id=? and target_id=? and type=?", userId, community.ID, _GroupType).Find(&contact)
 
 	if !contact.CreatedAt.IsZero() {
 		return -1, "已加过此群"
