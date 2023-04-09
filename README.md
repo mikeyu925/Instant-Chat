@@ -4,9 +4,13 @@
 
 #### 效果展示
 
-![easychat](./README.assets/easychat.gif)
+私聊效果展示：
 
-> 只录制了主要聊天功能，其他功能以图片展示如下
+<img src="./README.assets/image-20230409221521023.png" alt="image-20230409221521023" style="zoom:50%;" />
+
+群聊效果展示：
+
+<img src="./README.assets/image-20230409221638911.png" alt="image-20230409221638911" style="zoom:50%;" />
 
 个人中心界面：
 
