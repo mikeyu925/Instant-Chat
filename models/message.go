@@ -72,13 +72,19 @@ var clientMap map[int64]*Node = make(map[int64]*Node, 0)
 // 读写锁
 var rwLocker sync.RWMutex
 
-// 需要 ：发送者ID ，接受者ID ，消息类型，发送的内容，发送类型
+// Chat
+//
+//	@Description: 由用户A发送至用户B消息
+//	@param writer
+//	@param request
 func Chat(writer http.ResponseWriter, request *http.Request) {
 	//1.  获取参数 并 检验 token 等合法性
 	query := request.URL.Query()
+	// 获取用户的ID
 	Idstr := query.Get("userId")
 	userId, _ := strconv.ParseInt(Idstr, 10, 64)
-	isvalida := true //checkToke()  待.........
+
+	isvalida := true // 检验token合法性
 	conn, err := (&websocket.Upgrader{
 		//token 校验
 		CheckOrigin: func(r *http.Request) bool {
@@ -91,7 +97,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	//2.获取conn
-	currentTime := uint64(time.Now().Unix())
+	currentTime := uint64(time.Now().Unix()) // 获取当前时间
 	node := &Node{
 		Conn:          conn,
 		Addr:          conn.RemoteAddr().String(), //客户端地址
@@ -100,27 +106,26 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 		DataQueue:     make(chan []byte, 50),
 		GroupSets:     set.New(set.ThreadSafe),
 	}
-	//3.TODO 用户关系
-
-	//4. userid 跟 node绑定 并加锁
+	//3. userid 跟 node绑定 并加锁
 	rwLocker.Lock()
 	clientMap[userId] = node
 	rwLocker.Unlock()
-	//5.完成发送逻辑
+	//4.完成发送逻辑
 	go sendProc(node)
-	//6.完成接收逻辑
+	//5.完成接收逻辑
 	go recvProc(node)
-
-	//7.加入在线用户到缓存
+	//6.加入在线用户到缓存
 	SetUserOnlineInfo("online_"+Idstr, []byte(node.Addr), time.Duration(viper.GetInt("timeout.RedisOnlineTime"))*time.Hour)
-	//sendMsg(userId, []byte("欢迎进入聊天系统"))
 }
 
-// 发送线程
+// sendProc
+//
+//	@Description: 发送数据线程
+//	@param node 当前一个连接
 func sendProc(node *Node) {
 	for {
 		select {
-		case data := <-node.DataQueue:
+		case data := <-node.DataQueue: // 如果有数据要发送
 			fmt.Println("[ws]sendProc >>>> msg :", string(data))
 			err := node.Conn.WriteMessage(websocket.TextMessage, data)
 			if err != nil {
@@ -131,7 +136,10 @@ func sendProc(node *Node) {
 	}
 }
 
-// 接收线程
+// recvProc
+//
+//	@Description: 接收数据线程
+//	@param node
 func recvProc(node *Node) {
 	for {
 		_, data, err := node.Conn.ReadMessage()
@@ -148,13 +156,12 @@ func recvProc(node *Node) {
 		//心跳检测 msg.Media == -1 || msg.Type == 3
 		if msg.Type == HeartBeat {
 			currentTime := uint64(time.Now().Unix())
-			node.Heartbeat(currentTime)
+			node.Heartbeat(currentTime) // 更新用户心跳
 		} else {
-			dispatch(data)
+			dispatch(data) // 进行消息的调度
 			broadMsg(data) //todo 将消息广播到局域网
 			fmt.Println("[ws] recvProc <<<<< ", string(data))
 		}
-
 	}
 }
 
@@ -216,11 +223,14 @@ func udpRecvProc() {
 	}
 }
 
-// 后端调度逻辑处理--> 进行转发
+// dispatch
+//
+//	@Description: 对消息进行调度、转发
+//	@param data
 func dispatch(data []byte) {
 	msg := Message{}
-	msg.CreateTime = uint64(time.Now().Unix()) // 获得消息的创建时间
 	err := json.Unmarshal(data, &msg)
+	msg.CreateTime = uint64(time.Now().Unix()) // 获得消息的创建时间
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -230,9 +240,7 @@ func dispatch(data []byte) {
 		fmt.Println("dispatch  data :", string(data))
 		sendMsg(msg.TargetId, data)
 	case GroupChat: //群发
-		sendGroupMsg(msg.TargetId, data) //发送的群ID ，消息内容
-		//case HeartBeat: // 心跳
-		//	node.Heartbeat()
+		sendGroupMsg(msg.TargetId, data)
 	}
 }
 
@@ -267,10 +275,15 @@ func JoinGroup(userId uint, comId string) (int, string) {
 	}
 }
 
+// sendGroupMsg
+//
+//	@Description: 发送群消息
+//	@param targetId 群ID
+//	@param msg 消息
 func sendGroupMsg(targetId int64, msg []byte) {
-	fmt.Println("开始群发消息")
 	// 通过群id找到所有用户的信息
 	userIds := SearchUserByGroupId(uint(targetId))
+	// 将msg推送给所有群中的用户
 	for i := 0; i < len(userIds); i++ {
 		//排除给自己的
 		if targetId != int64(userIds[i]) {
@@ -279,35 +292,41 @@ func sendGroupMsg(targetId int64, msg []byte) {
 	}
 }
 
-func sendMsg(userId int64, msg []byte) {
+// sendMsg
+//
+//	@Description: 将消息msg发送至目标用户ID「后端只管发送，前端针对具体的消息类型和targetID进行渲染」
+//	@param targetId  目标用户ID
+//	@param msg 待发送消息
+func sendMsg(targetId int64, msg []byte) {
 	// 加锁
 	rwLocker.RLock()
-	node, ok := clientMap[userId]
+	recvNode, ok := clientMap[targetId]
 	rwLocker.RUnlock()
 
 	jsonMsg := Message{}
 	json.Unmarshal(msg, &jsonMsg)
 	// 获取一个上下文
 	ctx := context.Background()
-	targetIdStr := strconv.Itoa(int(userId))
-	userIdStr := strconv.Itoa(int(jsonMsg.UserId))
+	recvIdStr := strconv.Itoa(int(targetId))       // 消息接受者ID
+	sendIdStr := strconv.Itoa(int(jsonMsg.UserId)) // 消息发送者ID
 	jsonMsg.CreateTime = uint64(time.Now().Unix())
-	r, err := utils.RDB.Get(ctx, "online_"+userIdStr).Result()
+
+	r, err := utils.RDB.Get(ctx, "online_"+sendIdStr).Result()
 	if err != nil {
 		fmt.Println(err)
 	}
-	// 如果用户在线
-	if r != "" {
+
+	if r != "" { // 如果当前用户在线
 		if ok {
-			fmt.Println("sendMsg >>> ", userId, "  msg:", string(msg))
-			node.DataQueue <- msg // 通过管道发送消息
+			fmt.Println("sendMsg >>> ", targetId, "  msg:", string(msg))
+			recvNode.DataQueue <- msg // 通过管道发送消息
 		}
 	}
 	var key string
-	if userId > jsonMsg.UserId { // 这样是为了进行方便的渲染
-		key = "msg_" + userIdStr + "_" + targetIdStr
+	if targetId > jsonMsg.UserId { // 这样是为了进行方便的渲染
+		key = "msg_" + sendIdStr + "_" + recvIdStr
 	} else {
-		key = "msg_" + targetIdStr + "_" + userIdStr
+		key = "msg_" + recvIdStr + "_" + sendIdStr
 	}
 	// 查询出所有消息
 	res, err := utils.RDB.ZRevRange(ctx, key, 0, -1).Result()
@@ -316,7 +335,7 @@ func sendMsg(userId int64, msg []byte) {
 	}
 	score := float64(cap(res)) + 1                                     // 计算出当前的score
 	ress, e := utils.RDB.ZAdd(ctx, key, &redis.Z{score, msg}).Result() //jsonMsg
-	//res, e := utils.Red.Do(ctx, "zadd", key, 1, jsonMsg).Result() //备用 后续拓展 记录完整msg
+
 	if e != nil {
 		fmt.Println(e)
 	}
@@ -377,7 +396,11 @@ func CleanConnection(param interface{}) (result bool) {
 	return result
 }
 
-// 更新用户心跳
+// Heartbeat
+//
+//	@Description: 更新用户的心跳
+//	@receiver node
+//	@param currentTime
 func (node *Node) Heartbeat(currentTime uint64) {
 	node.HeartbeatTime = currentTime
 	return

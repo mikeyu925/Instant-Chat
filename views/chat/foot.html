@@ -1,7 +1,7 @@
 {{define "/chat/foot.shtml"}}
 <script>
     function upload(dom) {
-        uploadfile("attach/upload", dom, function (res) {
+        uploadfile("base/upload", dom, function (res) {
             if (res.Code == 0) {
                 app.sendpicmsg(res.Data)
             }
@@ -10,7 +10,7 @@
 
     //上传图片 创建群
     function uploadthis(dom) {
-        uploadfile("attach/upload", dom, function (res) {
+        uploadfile("base/upload", dom, function (res) {
             if (res.Code == 0) {
                 app.com.icon = res.Data;
                 console.log(res.Data);
@@ -20,7 +20,7 @@
 
     //维护用户头像
     function uploadUserInfo(dom) {
-        uploadfile("attach/upload", dom, function (res) {
+        uploadfile("base/upload", dom, function (res) {
             if (res.Code == 0) {
                 app.info.icon = res.Data;
                 console.log(res.Data);
@@ -142,13 +142,12 @@
 
             },
             created: function () {
-                this.loadfriends();
-                this.loadcommunitys();
+                this.loadfriends();  // 加载好友
+                this.loadcommunitys();  // 加载群组
                 this.loaddoutures();
                 setInterval(this.heartbeat, 10 * 1000); // 心跳检测
                 var user = userInfo()
-                //初始化websocket
-                this.initwebsocket()
+                this.initwebsocket() //初始化websocket
                 this.initUser();
 
             },
@@ -198,7 +197,7 @@
                             //是否可用
                             this.recorder.ondataavailable = (event) => {
                                 console.log("ondataavailable");
-                                uploadblob("attach/upload", event.data, ".mp3", res => {
+                                uploadblob("base/upload", event.data, ".mp3", res => {
                                     var duration = Math.ceil((new Date().getTime() - this.duration) / 1000);
                                     this.sendaudiomsg(res.Data, duration);
                                 })
@@ -457,6 +456,7 @@
                     }.bind(this))
 
                 },
+                // 发消息？
                 initwebsocket: function () {
                     var url = "ws://" + location.host + "/chat?userId=" + userId() + "&token=" + util.parseQuery("token");
                     this.webSocket = new WebSocket(url);
@@ -487,7 +487,7 @@
                 },
                 loadfriends: function () {
                     var that = this;
-                    post("/user/searchFriends", { userId: userId() }, function (res) {
+                    post("user/searchFriends", { userId: userId() }, function (res) {
                         that.friends = res.Rows || [];
                         var usermap = this.usermap;
                         for (var i in res.Rows) {
@@ -504,19 +504,11 @@
                     })
                 },
                 addfriend: function () {
-                    //console.log("addfriend....")
                     var that = this;
                     mui.prompt('', '请输入好友名称', '加好友', ['取消', '确认'], function (e) {
                         if (e.index == 1) {
-                            //判断数字
-                            //if (isNaN(e.value) || e.value <= 0) {
-                            //    mui.toast('格式错误');
-                            //} else {
-                            //mui.toast(e.value);
                             that._addfriend(e.value)
-                            //}
                         } else {
-                            //mui.toast('您取消了入库');
                         }
                     }, 'div');
                     document.querySelector('.mui-popup-input input').type = 'text';

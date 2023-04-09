@@ -9,7 +9,6 @@ import (
 )
 
 func Router() *gin.Engine {
-
 	r := gin.Default() // 初始化 gin 引擎
 	// 加载静态资源
 	{
@@ -22,15 +21,20 @@ func Router() *gin.Engine {
 	docs.SwaggerInfo.BasePath = ""
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	r.GET("/", service.GetIndex) // 首页
-	r.GET("/index", service.GetIndex)
+	r.GET("/", service.GetIndex)             // 首页
 	r.GET("/toRegister", service.ToRegister) // 返回注册页面
 	r.GET("/toChat", service.ToChat)         // 登陆之后跳转的页面
+	//r.GET("/index", service.GetIndex)
+
 	r.GET("/chat", service.Chat)
 
-	r.POST("/attach/upload", service.Upload) //上传文件
+	// 基础功能组件路由组
+	base := r.Group("/base")
+	{
+		base.POST("/upload", service.Upload) //上传文件
+	}
 
-	// 用户模块路由组
+	// 用户基础模块路由组
 	userRouter := r.Group("/user")
 	{
 		userRouter.POST("/getUserList", service.GetUserList)                   // 获取用户列表  --- 暂时无用
@@ -44,7 +48,7 @@ func Router() *gin.Engine {
 		userRouter.POST("/searchFriends", service.SearchFriends)               // 查找好友
 	}
 
-	// 聊天相关路由组
+	// 用户关系相关路由组
 	contactRouter := r.Group("/contact")
 	{
 		contactRouter.POST("/addfriend", service.AddFriend)             //添加好友

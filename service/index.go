@@ -59,6 +59,10 @@ func ToChat(c *gin.Context) {
 	ind.Execute(c.Writer, user)
 }
 
+// Chat
+//
+//	@Description: 聊天功能
+//	@param c
 func Chat(c *gin.Context) {
 	models.Chat(c.Writer, c.Request)
 }

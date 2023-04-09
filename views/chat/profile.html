@@ -1,4 +1,5 @@
 {{define "/chat/profile.shtml"}}
+<!--个人中心界面-->
 <div id="tabbar-profile" class="mui-control-content user-info" v-show="win=='main'">
     <header class="mui-bar mui-bar-nav">
         <h1 class="mui-title">个人中心</h1>
@@ -10,7 +11,7 @@
                 :src="info.icon || '/asset/images/avatar0.png'">
             <div class="mui-media-body">
                 <span v-text="info.name">betatech</span>
-                <p class='mui-ellipsis' v-text="profile.memo">专业可靠的IM解决方案专家</p>
+                <p class='mui-ellipsis' v-text="profile.memo"></p>
             </div>
 
         </li>

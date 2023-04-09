@@ -25,7 +25,11 @@ func (table *Contact) TableName() string {
 	return "contact"
 }
 
-// 查找用户好友列表
+// SearchFriend
+//
+//	@Description: 查找用户好友列表
+//	@param userId 当前用户id
+//	@return []UserBasic 其好友列表
 func SearchFriend(userId uint) []UserBasic {
 	contacts := make([]Contact, 0)
 	objIds := make([]uint64, 0)
@@ -39,8 +43,6 @@ func SearchFriend(userId uint) []UserBasic {
 	utils.DB.Where("id in ?", objIds).Find(&users)
 	return users
 }
-
-// 添加好友 userID:自己的ID, targetName:好友名字「因为开始是不知道对方的Id的」好友的ID
 
 // AddFriend
 //
@@ -100,6 +102,11 @@ func AddFriend(userId uint, targetName string) (int, string) {
 	return -1, "好友用户名不能为空!"
 }
 
+// SearchUserByGroupId
+//
+//	@Description: 查找当前群中的所有用户ID
+//	@param communityId  群id
+//	@return []uint 当前群中所有用户的ID
 func SearchUserByGroupId(communityId uint) []uint {
 	contacts := make([]Contact, 0)
 	objIds := make([]uint, 0) // 所有用户id
