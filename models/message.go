@@ -110,9 +110,9 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	rwLocker.Lock()
 	clientMap[userId] = node
 	rwLocker.Unlock()
-	//4.完成发送逻辑
+	//4.开启发送数据协程
 	go sendProc(node)
-	//5.完成接收逻辑
+	//5.开启接收数据协程
 	go recvProc(node)
 	//6.加入在线用户到缓存
 	SetUserOnlineInfo("online_"+Idstr, []byte(node.Addr), time.Duration(viper.GetInt("timeout.RedisOnlineTime"))*time.Hour)
@@ -143,6 +143,7 @@ func sendProc(node *Node) {
 func recvProc(node *Node) {
 	for {
 		_, data, err := node.Conn.ReadMessage()
+
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -159,7 +160,7 @@ func recvProc(node *Node) {
 			node.Heartbeat(currentTime) // 更新用户心跳
 		} else {
 			dispatch(data) // 进行消息的调度
-			broadMsg(data) //todo 将消息广播到局域网
+			broadMsg(data) // 将消息广播到局域网 TODO
 			fmt.Println("[ws] recvProc <<<<< ", string(data))
 		}
 	}
@@ -167,10 +168,17 @@ func recvProc(node *Node) {
 
 var udpsendChan chan []byte = make(chan []byte, 1024)
 
+// broadMsg
+//
+//	@Description: 广播消息
+//	@param data  广播的数据
 func broadMsg(data []byte) {
 	udpsendChan <- data
 }
 
+// InitUDPProc
+//
+//	@Description: 初始化UDP相关协程
 func InitUDPProc() {
 	go udpSendProc()
 	go udpRecvProc()
@@ -310,13 +318,13 @@ func sendMsg(targetId int64, msg []byte) {
 	recvIdStr := strconv.Itoa(int(targetId))       // 消息接受者ID
 	sendIdStr := strconv.Itoa(int(jsonMsg.UserId)) // 消息发送者ID
 	jsonMsg.CreateTime = uint64(time.Now().Unix())
-
-	r, err := utils.RDB.Get(ctx, "online_"+sendIdStr).Result()
+	// 这里应该是判断对方用户是否在线吧
+	r, err := utils.RDB.Get(ctx, "online_"+recvIdStr).Result()
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	if r != "" { // 如果当前用户在线
+	if r != "" { // 如果对方用户在线
 		if ok {
 			fmt.Println("sendMsg >>> ", targetId, "  msg:", string(msg))
 			recvNode.DataQueue <- msg // 通过管道发送消息

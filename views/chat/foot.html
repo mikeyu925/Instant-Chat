@@ -311,7 +311,6 @@
                 sendtxtmsg: function (txt) {//跟谁单聊
                     if (this.isDisable) {
                         this.setTimeFlag()
-                        //{id:1,userid:2,dstid:3,cmd:10,media:1,content:"hello"}
                         var msg = this.createmsgcontext();
                         msg.Media = 1;
                         msg.Content = txt;
