@@ -330,8 +330,9 @@ func sendMsg(targetId int64, msg []byte) {
 			recvNode.DataQueue <- msg // 通过管道发送消息
 		}
 	}
+	// 用户id小的放在前面  这样是为了进行方便的渲染
 	var key string
-	if targetId > jsonMsg.UserId { // 这样是为了进行方便的渲染
+	if targetId > jsonMsg.UserId {
 		key = "msg_" + sendIdStr + "_" + recvIdStr
 	} else {
 		key = "msg_" + recvIdStr + "_" + sendIdStr
@@ -351,12 +352,22 @@ func sendMsg(targetId int64, msg []byte) {
 }
 
 // 获取缓存里面的消息
+//
+// RedisMsg
+//
+//	@Description: 读取用户A和用户B从start到end的缓存消息
+//	@param userIdA
+//	@param userIdB
+//	@param start
+//	@param end
+//	@param isRev 是否倒序读取
+//	@return []string 两个用户的聊天数据
 func RedisMsg(userIdA int64, userIdB int64, start int64, end int64, isRev bool) []string {
-	rwLocker.RLock()
-	rwLocker.RUnlock()
+
 	ctx := context.Background()
 	userIdStr := strconv.Itoa(int(userIdA))
 	targetIdStr := strconv.Itoa(int(userIdB))
+	// 用户id比较小的放在前面
 	var key string
 	if userIdA > userIdB {
 		key = "msg_" + targetIdStr + "_" + userIdStr
@@ -374,7 +385,7 @@ func RedisMsg(userIdA int64, userIdB int64, start int64, end int64, isRev bool) 
 	if err != nil {
 		fmt.Println(err) //没有找到
 	}
-	return rels // 直接返回所有缓存消息，交给前端处理
+	return rels // 直接返回所有缓存消息， 交给前端处理
 }
 
 // 需要重写此方法才能完整的msg转byte[]

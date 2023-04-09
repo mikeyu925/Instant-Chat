@@ -26,11 +26,10 @@ func Router() *gin.Engine {
 	r.GET("/toChat", service.ToChat)         // 登陆之后跳转的页面
 	//r.GET("/index", service.GetIndex)
 
-	r.GET("/chat", service.Chat)
-
 	// 基础功能组件路由组
 	base := r.Group("/base")
 	{
+		base.GET("/chat", service.Chat)      // 聊天
 		base.POST("/upload", service.Upload) //上传文件
 	}
 
@@ -43,7 +42,6 @@ func Router() *gin.Engine {
 		userRouter.POST("/updateUser", service.UpdateUser)                     // 更新用户信息
 		userRouter.POST("/findUserByNameAndPwd", service.FindUserByNameAndPwd) // 用户登陆
 		userRouter.POST("/find", service.FindByID)                             // 查找用户
-		userRouter.GET("/sendMsg", service.SendMsg)                            // 发送消息
 		userRouter.POST("/redisMsg", service.RedisMsg)                         // 缓存
 		userRouter.POST("/searchFriends", service.SearchFriends)               // 查找好友
 	}

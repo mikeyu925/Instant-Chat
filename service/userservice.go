@@ -7,7 +7,6 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -238,46 +237,6 @@ var upGrader = websocket.Upgrader{
 	},
 }
 
-func SendMsg(c *gin.Context) {
-	// 协议升级
-	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	// 延迟关闭
-	defer func(ws *websocket.Conn) {
-		err = ws.Close()
-		if err != nil {
-			fmt.Println(err)
-		}
-	}(ws)
-	// 消息处理Handler
-	MsgHandler(c, ws)
-}
-
-func MsgHandler(c *gin.Context, ws *websocket.Conn) {
-	for {
-		msg, err := utils.Subscribe(c, utils.PublishKey)
-		if err != nil {
-			fmt.Println(" MsgHandler 发送失败", err)
-		}
-
-		// 获取当前时间
-		tm := time.Now().Format("2006-01-02 15:04:05")
-		m := fmt.Sprintf("[ws][%s]:%s", tm, msg)
-		// 写数据返回
-		err = ws.WriteMessage(1, []byte(m))
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
-}
-
-func SendUserMsg(c *gin.Context) {
-	models.Chat(c.Writer, c.Request)
-}
-
 // SearchFriends
 //
 //	@Description: 查找用户userId的好友
@@ -365,6 +324,10 @@ func FindByID(c *gin.Context) {
 	utils.RespOK(c.Writer, data, "ok")
 }
 
+// RedisMsg
+//
+//	@Description: 查找两个用户A和用户B的聊天记录缓存
+//	@param c
 func RedisMsg(c *gin.Context) {
 	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
 	userIdB, _ := strconv.Atoi(c.PostForm("userIdB"))
