@@ -14,6 +14,9 @@ import (
 	"time"
 )
 
+// InitConfig
+//
+//	@Description: 初始化配置文件读取
 func InitConfig() {
 	viper.SetConfigName("app")    // 配置文件名称
 	viper.AddConfigPath("config") // 查找配置文件所在的路径
@@ -25,11 +28,15 @@ func InitConfig() {
 	color.Green("Init Config Successfully!")
 }
 
+// 全局变量
 var (
 	DB  *gorm.DB
 	RDB *redis.Client
 )
 
+// InitMySQL
+//
+//	@Description: 初始化Mysql
 func InitMySQL() {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
@@ -50,6 +57,10 @@ func InitMySQL() {
 	}
 	color.Green("Init Mysql Successfully!")
 }
+
+// InitRedis
+//
+//	@Description: 初始化Redis
 func InitRedis() {
 	RDB = redis.NewClient(&redis.Options{
 		Addr:         viper.GetString("redis.addr"),
@@ -65,32 +76,4 @@ func InitRedis() {
 	} else {
 		color.Green("Init Redis Successfully : %s", pong)
 	}
-}
-
-const (
-	PublishKey = "websocket"
-)
-
-// Publish 发布消息到Redis
-func Publish(ctx context.Context, channel string, msg string) error {
-	var err error
-	fmt.Println("Publish 。。。。", msg)
-	err = RDB.Publish(ctx, channel, msg).Err()
-	if err != nil {
-		fmt.Println(err)
-	}
-	return err
-}
-
-// Subscribe 订阅Redis消息
-func Subscribe(ctx context.Context, channel string) (string, error) {
-	sub := RDB.Subscribe(ctx, channel)
-	fmt.Println("Subscribe1 ... ", ctx)
-	msg, err := sub.ReceiveMessage(ctx)
-	if err != nil {
-		fmt.Println(err)
-		return "", err
-	}
-	fmt.Println("Subscribe2 ... ", msg.Payload)
-	return msg.Payload, err
 }

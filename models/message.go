@@ -126,7 +126,7 @@ func sendProc(node *Node) {
 	for {
 		select {
 		case data := <-node.DataQueue: // 如果有数据要发送
-			fmt.Println("[ws]sendProc >>>> msg :", string(data))
+			// fmt.Println("[ws]sendProc >>>> msg :", string(data))
 			err := node.Conn.WriteMessage(websocket.TextMessage, data)
 			if err != nil {
 				fmt.Println(err)
@@ -161,7 +161,7 @@ func recvProc(node *Node) {
 		} else {
 			dispatch(data) // 进行消息的调度
 			broadMsg(data) // 将消息广播到局域网 TODO
-			fmt.Println("[ws] recvProc <<<<< ", string(data))
+			// fmt.Println("[ws] recvProc <<<<< ", string(data))
 		}
 	}
 }
@@ -198,7 +198,7 @@ func udpSendProc() {
 	for {
 		select {
 		case data := <-udpsendChan:
-			fmt.Println("udpSendProc  data :", string(data))
+			// fmt.Println("udpSendProc  data :", string(data))
 			_, err = con.Write(data)
 			if err != nil {
 				fmt.Println(err)
@@ -226,7 +226,7 @@ func udpRecvProc() {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println("udpRecvProc  data :", string(buf[0:n]))
+		// fmt.Println("udpRecvProc  data :", string(buf[0:n]))
 		dispatch(buf[0:n])
 	}
 }
@@ -245,7 +245,6 @@ func dispatch(data []byte) {
 	}
 	switch msg.Type {
 	case One2OneChat: //私信
-		fmt.Println("dispatch  data :", string(data))
 		sendMsg(msg.TargetId, data)
 	case GroupChat: //群发
 		sendGroupMsg(msg.TargetId, data)
@@ -326,7 +325,7 @@ func sendMsg(targetId int64, msg []byte) {
 
 	if r != "" { // 如果对方用户在线
 		if ok {
-			fmt.Println("sendMsg >>> ", targetId, "  msg:", string(msg))
+			// fmt.Println("sendMsg >>> ", targetId, "  msg:", string(msg))
 			recvNode.DataQueue <- msg // 通过管道发送消息
 		}
 	}
@@ -393,7 +392,11 @@ func (msg Message) MarshalBinary() ([]byte, error) {
 	return json.Marshal(msg)
 }
 
-// 每隔一段时间进行超时连接清理
+// CleanConnection
+//
+//	@Description: 对超时的连接进行清理
+//	@param param
+//	@return result
 func CleanConnection(param interface{}) (result bool) {
 	result = true
 	defer func() {
@@ -401,15 +404,14 @@ func CleanConnection(param interface{}) (result bool) {
 			fmt.Println("cleanConnection err", r)
 		}
 	}()
-	//fmt.Println("定时任务,清理超时连接 ", param)
-	//node.IsHeartbeatTimeOut()
+
 	currentTime := uint64(time.Now().Unix()) // 当前时间获取
 	for i := range clientMap {               // 遍历所有连接，关闭超时连接
 		node := clientMap[i]
 		if node.IsHeartbeatTimeOut(currentTime) {
 			node.Conn.Close()
 			// 应该把当前连接从clientMap移除?
-			//delete(clientMap, i)
+			delete(clientMap, i)
 		}
 	}
 	return result
@@ -425,10 +427,15 @@ func (node *Node) Heartbeat(currentTime uint64) {
 	return
 }
 
-// 用户心跳是否超时
+// IsHeartbeatTimeOut
+//
+//	@Description: 判断用户是否超时
+//	@receiver node
+//	@param currentTime
+//	@return timeout
 func (node *Node) IsHeartbeatTimeOut(currentTime uint64) (timeout bool) {
 	if node.HeartbeatTime+viper.GetUint64("timeout.HeartbeatMaxTime") <= currentTime {
-		fmt.Println(node.Addr, ": 心跳超时..... 关闭连接：")
+		//fmt.Println(node.Addr, ": 心跳超时..... 关闭连接：")
 		timeout = true
 	}
 	return

@@ -12,10 +12,10 @@ oss:
   AccessKeySecret: "T2LiBvRVCvQfb3l3gvAVFOfYPBBKnl"
   Bucket: "easychat-fish"
 timeout:
-  DelayHeartbeat: 10
-  HeartbeatHz: 30
-  HeartbeatMaxTime: 10800
-  RedisOnlineTime: 4  # 缓存的在线用户时长，单位小时
+  DelayHeartbeat: 5 # 10      # 心跳检测定时器初次检测时间 单位秒
+  HeartbeatHz: 5 # 30         # 心跳检测定时器重置时间 单位秒
+  HeartbeatMaxTime: 10 # 10800 # 判断连接是否应该断开的最大阈值时间 单位秒
+  RedisOnlineTime: 4      # 缓存的在线用户时长 单位小时
 
 port:
   server: ":8082"
