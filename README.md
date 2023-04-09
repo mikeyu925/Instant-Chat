@@ -1,6 +1,24 @@
-
+### 基于Golang的即时通信项目 EasyChat
 
 > 感谢室友周昊宇的前端技术支持～ 周神YYDS
+
+#### 效果展示
+
+![easychat](./README.assets/easychat.gif)
+
+> 只录制了主要聊天功能，其他功能以图片展示如下
+
+个人中心界面：
+
+<img src="./README.assets/image-20230409220720490.png" alt="image-20230409220720490" style="zoom:50%;" />
+
+创建群界面：
+
+<img src="./README.assets/image-20230409220838862.png" alt="image-20230409220838862" style="zoom:50%;" />
+
+联系人界面：
+
+<img src="./README.assets/image-20230409220908731.png" alt="image-20230409220908731" style="zoom:50%;" />
 
 
 
@@ -60,6 +78,7 @@ colorPrint.Add(color.BgGreen) // 绿色背景
 
 
 gorm.logger 作用?
+
 > 开启慢查询日志?
 
 govalidator 实现修改用户信息时电话和邮箱格式的校验
@@ -124,15 +143,23 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 
 ---
 
-加入自定义中间件
+**加入自定义中间件**
 
 > 还没想好中间件做什么功能
 
 
 
-缓存消息记录
+**缓存消息记录** 「OK」
+
+> 通过Redis Zset 来存储聊天记录，每当有新的一条消息「比如userIDA给userIDB发送msg」，则发送之后将该消息存储在Redis缓存中
+>
+> 注意：为了方便前端进行渲染，定义key的分数为当前已经聊天的消息数量cap + 1「从而保证缓存聊天记录顺序是有序的，方便前端进行渲染」
 
 
+
+**通过UDP实现系统通知**
+
+> 
 
 
 
@@ -164,7 +191,7 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 > 	contact := Contact{}
 > 	contact.OwnerId = userI
 > 	contact.Type = 2
->   
+> 
 > 	community := Community{}
 > 
 > 	// 查询群是否存在「通过群名或者群id」
@@ -196,20 +223,20 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 >
 > ```go
 > _addfriend: function (dstobj) {
->   //防止一次点击 穿透访问多次
->   if (this.isDisable) { // 如果可以发起请求
->     this.setTimeFlag() // set isDisable
->     var that = this
->     // 发起添加好友请求
->     post("contact/addfriend", { targetName: dstobj, userId: userId() }, function (res) {
->       if (res.Code == 0) {
->         mui.toast("添加成功");
->         that.loadfriends(); // 加载好友列表
->       } else {
->         mui.toast(res.Msg);
->       }
->     })
->   }
+> //防止一次点击 穿透访问多次
+> if (this.isDisable) { // 如果可以发起请求
+>  this.setTimeFlag() // set isDisable
+>  var that = this
+>  // 发起添加好友请求
+>  post("contact/addfriend", { targetName: dstobj, userId: userId() }, function (res) {
+>    if (res.Code == 0) {
+>      mui.toast("添加成功");
+>      that.loadfriends(); // 加载好友列表
+>    } else {
+>      mui.toast(res.Msg);
+>    }
+>  })
+> }
 > },
 > ```
 >
@@ -236,16 +263,20 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 #### 报错记录
 
 ---
+
 **Incorrect datetime value: '0000-00-00' for column 'login_time' at row 1**
 
 > 应该是日期字段在mysql 5.7 之后不能为'0000-00-00 00:00:00'，这里采用设置默认值解决
+>
 > ```go
 > LoginTime     time.Time `gorm:"default:NULL"`
 > HeartbeatTime time.Time `gorm:"default:NULL"`
 > ```
 
 
+
 ---
+
 **DENIED Redis is running in protected mode because protected mode is enabled, no bind address was specified, no authentication password is requested to clients.**
 
 > 错误原因：由于redis的保护模式开启了，并且没有绑定ip地址，没有密码认证
@@ -257,6 +288,7 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 **error]: dial tcp :6379: connect: connection refused**
 
 解决方法：修改redis.config 中的`bind 127.0.0.1 ::1` 为 `bind 0.0.0.0`
+
 >关闭redis :sudo systemctl stop redis-server 
 
 >重启redis :sudo systemctl restart redis-server 
@@ -308,7 +340,6 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 >   ```sql
 >   ALTER TABLE `test_db`.`username`  MODIFY COLUMN `password` varchar(30)  CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 >   ```
->
 
 
 
