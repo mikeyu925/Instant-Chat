@@ -261,6 +261,12 @@ func AddFriend(c *gin.Context) {
 		utils.RespFail(c.Writer, msg)
 	}
 }
+
+//
+// DeleteFriend
+//  @Description: 删除好友
+//  @param c
+//
 func DeleteFriend(c *gin.Context) {
 	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
 	targetName := c.Request.FormValue("targetName")
