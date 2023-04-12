@@ -102,6 +102,58 @@ func AddFriend(userId uint, targetName string) (int, string) {
 	return -1, "好友用户名不能为空!"
 }
 
+// DeleteFriend
+//
+//	@Description: 删除好友关系
+//	@param userId  当前用户id
+//	@param targetName 目标用户用户名
+//	@return int    0: 成功 1:失败
+//	@return string 响应信息
+func DeleteFriend(userId uint, targetName string) (int, string) {
+	// 查找用户名
+	if targetName == "" {
+		return -1, "好友用户名不能为空!"
+	}
+	targetUser := FindUserByName(targetName) // 通过名字查找用户
+	if targetUser.Salt == "" {
+		return -1, "查无此用户！"
+	}
+	if targetUser.ID == userId {
+		return -1, "不能添加自己！"
+	}
+	// 判断是否已经是好友关系
+	contact0 := Contact{}
+	utils.DB.Where("owner_id =?  and target_id =? and type=1", userId, targetUser.ID).Find(&contact0)
+	if contact0.ID == 0 {
+		return -1, "他/她并不是你的好友！"
+	}
+	contact1 := Contact{}
+	utils.DB.Where("owner_id =?  and target_id =? and type=1", targetUser.ID, userId).Find(&contact1)
+	if contact1.ID == 0 {
+		return -1, "你并不是他/她的好友！"
+	}
+	// 开启一个事务
+	tx := utils.DB.Begin()
+	defer func() { //事务一旦开始，不论什么异常最终都会 Rollback
+		// 如果出现异常就回滚
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if err := utils.DB.Delete(&contact0).Error; err != nil {
+		tx.Rollback()
+		return -1, "将它从你列表删除失败!"
+	}
+	if err := utils.DB.Delete(&contact1).Error; err != nil {
+		tx.Rollback()
+		return -1, "将你从它列表删除失败!"
+	}
+	// 提交事务
+	tx.Commit()
+
+	return 0, "删除好友成功~"
+}
+
 // SearchUserByGroupId
 //
 //	@Description: 查找当前群中的所有用户ID

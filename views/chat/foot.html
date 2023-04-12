@@ -529,6 +529,32 @@
                         })
                     }
                 },
+                deletefriend: function () {
+                    var that = this;
+                    mui.prompt('', '请输入删除的好友名称', '删除好友', ['取消', '确认'], function (e) {
+                        if (e.index == 1) {
+                            that._deletefriend(e.value)
+                        } else {
+                        }
+                    }, 'div');
+                    document.querySelector('.mui-popup-input input').type = 'text';
+                },
+                _deletefriend: function (dstobj) {
+                    //防止一次点击 穿透访问多次
+                    if (this.isDisable) { // 如果可以发起请求
+                        this.setTimeFlag() // set isDisable
+                        var that = this
+                        // 发起删除好友请求
+                        post("contact/deletefriend", { targetName: dstobj, userId: userId() }, function (res) {
+                            if (res.Code == 0) {
+                                mui.toast("删除成功");
+                                that.loadfriends(); // 加载好友列表
+                            } else {
+                                mui.toast(res.Msg);
+                            }
+                        })
+                    }
+                },
                 //个人资料修改显示
                 setUserInfo: function () {
                     this.win = "userinfo"

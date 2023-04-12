@@ -50,6 +50,7 @@ func Router() *gin.Engine {
 	contactRouter := r.Group("/contact")
 	{
 		contactRouter.POST("/addfriend", service.AddFriend)             //添加好友
+		contactRouter.POST("/deletefriend", service.DeleteFriend)       //删除好友
 		contactRouter.POST("/createCommunity", service.CreateCommunity) //创建群聊
 		contactRouter.POST("/loadcommunity", service.LoadCommunity)     // 加载群列表
 		contactRouter.POST("/joinGroup", service.JoinGroups)            // 加入群组

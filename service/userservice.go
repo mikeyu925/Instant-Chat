@@ -261,6 +261,16 @@ func AddFriend(c *gin.Context) {
 		utils.RespFail(c.Writer, msg)
 	}
 }
+func DeleteFriend(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
+	targetName := c.Request.FormValue("targetName")
+	code, msg := models.DeleteFriend(uint(userId), targetName)
+	if code == 0 {
+		utils.RespOK(c.Writer, code, msg)
+	} else {
+		utils.RespFail(c.Writer, msg)
+	}
+}
 
 // CreateCommunity
 //

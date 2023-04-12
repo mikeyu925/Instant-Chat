@@ -2,7 +2,7 @@
 
 > 感谢室友周昊宇的前端技术支持～ 周神YYDS
 
-#### 效果展示
+#### 功能展示
 
 私聊效果展示：
 
@@ -14,15 +14,15 @@
 
 个人中心界面：
 
-<img src="./README.assets/image-20230409220720490.png" alt="image-20230409220720490" style="zoom:50%;" />
+<img src="./README.assets/image-20230409220720490.png" alt="image-20230409220720490" style="zoom: 33%;" />
 
 创建群界面：
 
-<img src="./README.assets/image-20230409220838862.png" alt="image-20230409220838862" style="zoom:50%;" />
+<img src="./README.assets/image-20230409220838862.png" alt="image-20230409220838862" style="zoom: 33%;" />
 
 联系人界面：
 
-<img src="./README.assets/image-20230409220908731.png" alt="image-20230409220908731" style="zoom:50%;" />
+<img src="./README.assets/image-20230409220908731.png" alt="image-20230409220908731" style="zoom: 33%;" />
 
 
 
@@ -89,12 +89,6 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 
 
 
-#### 功能展示
-
----
-
-![image-20230404222743810](./README.assets/image-20230404222743810.png)
-
 
 
 #### 性能调优
@@ -147,6 +141,10 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 
 ---
 
+**增加删除好友**
+
+
+
 **加入自定义中间件**
 
 > 还没想好中间件做什么功能
@@ -164,6 +162,16 @@ govalidator 实现修改用户信息时电话和邮箱格式的校验
 **通过UDP实现系统通知**
 
 > 
+
+
+
+**添加好友增加「请求、同意/拒绝」流程**
+
+
+
+
+
+
 
 
 
